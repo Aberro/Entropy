@@ -1,0 +1,166 @@
+break
+alias Threshold d0
+define do1 $959F #Door 1
+define do2 $9569 #Door 2
+define psi $959D #Pressure sensor inside
+define ps1 $95BB #Pressure sensor 1
+define ps2 $95DD #Pressure sensor 2
+define msi $9819 #Motion sensor inside
+define ms1 $96EB #Motion sensor 1
+define ms2 $96EC #Motion sensor 2
+define bt1 $96AF #Button 1
+define bt2 $96B0 #Button 2
+define con $9651 #Console
+define vei $9A74 #Vent inside
+define ve1 $9755 #Vent 1
+define ve2 $9761 #Vent 2
+define lvr $97ED #Equalization lever
+
+#Initialize
+sd vei Lock 0
+sd ve1 Lock 0
+sd ve2 Lock 0
+#Select current mode
+modeSelect:
+ yield #Ensure we do not get interrupted
+ ld r0 lvr Setting
+ bnez r0 equalize #Check if equalization is requested
+ ld r0 do1 Open
+ beqz r0 closed #Check if door 1 is closed
+ ld r0 do2 Open
+ beqz r0 closed #Check if door 2 is closed
+normal:
+ #Both doors are opened, we're in normal mode
+ #load motion sensors
+ ld r0 msi Activate
+ ld r1 ms1 Activate
+ ld r2 ms2 Activate
+ breqz r0 4
+  #if inside, turn on both doors
+  move r1 1
+  move r2 1
+ #turn doors on/off, this is for lighting
+ sd do1 On r1
+ sd do2 On r2
+ ld r0 ps1 Pressure
+ ld r1 ps2 Pressure
+ sub r2 r0 r1 #compare pressure
+ abs r3 r2
+ l r0 d0 Setting #check threshold
+ blt r3 r0 modeSelect #pressure ok, continue cycle
+ #pressure not ok, change state
+ sd do1 Open 0 #close both doors
+ sd do2 Open 0
+ sd do1 On 1 #turn on lighting
+ sd do2 On 1
+ sd do1 Lock 1 #make the lighing red
+ sd do2 Lock 1 #and continue into closed state
+closed:
+ yield
+ ld r0 lvr Setting
+ bnez r0 equalize #check if equalization is requested
+ ld r0 ms1 Activate
+ ld r1 bt1 Activate
+ add r0 r0 r1
+ breqz r0 14 #check motion sens. 1
+  ld r1 do1 Open
+  bnez r1 closed #door 1 is already opened
+  ld r1 do2 Open
+  brnez r1 3 #both doors are closed
+   sd do1 Open 1 #so we can simply open the door 1
+   j closed
+  #otherwise, we need to transition
+  move r0 do1
+  move r1 do2
+  move r2 ve1
+  move r3 ve2
+  move r4 ps1
+  j transition
+ ld r0 ms2 Activate
+ ld r1 bt2 Activate
+ add r0 r0 r1
+ breqz r0 14
+  ld r1 do2 Open
+  bnez r1 closed #door 2 is already opened
+  ld r1 do1 Open
+  brnez r1 3 #both doors are closed
+   sd do2 Open 1 #so we can simply open the door 2
+   j closed
+  #otherwise, we need to transition
+  move r0 do2
+  move r1 do1
+  move r2 ve2
+  move r3 ve1
+  move r4 ps2
+  j transition
+ j closed #repeat cycle
+
+#Function
+#r0 - door to open
+#r1 - door to close
+#r2 - vent to transition to
+#r3 - vent to transition from
+#r4 - transition to pressure sensor
+transition:
+ sd bt1 Lock 1
+ sd bt2 Lock 1
+ sd lvr Lock 1
+ s db Setting r0
+ sd r0 Open 0
+ sd r1 Open 0
+ yield #wait for doors to close
+ #Pump the atmosphere out of airlock
+ sd vei Mode 1
+ sd vei On 1
+ sd r3 Mode 0 #vent to transition from
+ sd r3 On 1
+ sd r2 On 0 #ensure transition to is off
+ yield #wait for vents to pump out
+ ld r5 psi Pressure
+ brnez r5 -2 #repeat while pressure >0
+ sd r3 Mode 0
+ sleep 5
+ #Pump the atmosphere into the airlock
+ sd vei Mode 0
+ sd r3 On 0
+ sd r2 Mode 1 #pump atmos from transition to.
+ sd r2 On 1
+ yield #wait for vents to pump in
+ ld r5 psi Pressure
+ ld r6 r4 Pressure
+ brlt r5 r6 -3
+ #Turn off pumps and open the door
+ sd r0 Open 1
+ sd r2 Mode 0 #pump gas out of pipe
+ sd r3 On 0
+ sleep 5 #to dump gases from the pipes
+ sd vei On 0 #now turn off vents
+ sd r2 On 0
+ sd bt1 Lock 0
+ sd bt2 Lock 0
+ sd lvr Lock 0
+ j closed #return to previous mode.
+#Function - equalize atmosphere at both sides
+equalize:
+ yield
+ ld r1 ps1 Pressure #load pressure on side 1
+ ld r2 ps2 Pressure #load pressure on side 2
+ sub r0 r1 r2
+ abs r1 r0
+ l r2 Threshold Setting
+ mul r2 r2 4 #Increase threshold
+ brgt r1 r2 12 #check if pressure diff. is below
+  #Reset to normal mode
+  sd do1 Open 1
+  sd do2 Open 1
+  sd do1 Lock 0
+  sd do2 Lock 0
+  sd ve1 On 0
+  sd ve2 On 0
+  sd vei On 0
+  sd lvr Open 0
+  sleep 15 #wait for passive equalization
+  j modeSelect
+ brgtz r0 7 #choose source and destination
+  #side 2 have higher pressure
+  sd ve1 Mode 0

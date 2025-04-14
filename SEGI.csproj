@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net472</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+	<Import Project="local.props" Condition="Exists('local.props')" />
+	<ItemGroup>
+		<None Remove="**\*" />
+		<Compile Remove="**\*" />
+		<Content Remove="**\*" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(StationeersPath)' != '' and Exists('$(StationeersPath)BepInEx\core\BepInEx.dll')">
+		<Compile Include="Scripts\SEGI\SEGIBehavior.cs" />
+		<Compile Include="Scripts\SEGI\SEGICascaded.cs" />
+		<Compile Include="Scripts\SEGI\SEGIPreset.cs" />
+		<Compile Include="Scripts\Utilities\AssetsManager.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Include="UnityEngine">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.AssetBundleModule">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+		<FilesToCopy Include="$(OutputPath)SEGI.dll" />
+	</ItemGroup>
+	<Target Name="CopyAfterBuild" AfterTargets="Build">
+		<Copy SourceFiles="@(FilesToCopy)" DestinationFolder="UnityAssetsProject\Assets\Assemblies\" SkipUnchangedFiles="true" />
+	</Target>
+</Project>

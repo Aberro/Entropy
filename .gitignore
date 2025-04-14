@@ -1,0 +1,11 @@
+bin
+obj
+.vs
+/UnityAssetsProject/Library
+/UnityAssetsProject/UserSettings/Layouts
+/UnityAssetsProject/.vsconfig
+/UnityAssetsProject/AssetBundles
+/UnityAssetsProject/Logs
+/UnityAssetsProject/Packages
+/UnityAssetsProject/UserSettings
+/local.props
