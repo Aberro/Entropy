@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Entropy.Assets.Scripts.Processor
+namespace Entropy.Scripts.Processor
 {
 	public class Parser
 	{

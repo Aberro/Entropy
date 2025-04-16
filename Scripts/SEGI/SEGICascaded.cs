@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
 using System;
-using Entropy.Assets.Scripts.Assets.Scripts.Utilities;
+using Entropy.Scripts.Utilities;
 
 [ExecuteInEditMode]
 [ImageEffectAllowedInSceneView]

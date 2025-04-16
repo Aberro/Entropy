@@ -5,10 +5,10 @@ using HarmonyLib;
 using Networks;
 using System.Linq;
 using Assets.Scripts.Util;
-using Entropy.Assets.Scripts.Atmospherics;
-using Entropy.Assets.Scripts.Utilities;
+using Entropy.Scripts.Atmospherics;
+using Entropy.Scripts.Utilities;
 
-namespace Entropy.Assets.Scripts.Patches
+namespace Entropy.Scripts.Patches
 {
 #if DISABLE
     public class IceFormation

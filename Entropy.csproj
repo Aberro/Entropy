@@ -38,7 +38,6 @@
 		</Otherwise>
 	</Choose>
 	<ItemGroup Condition="'$(StationeersPath)' != '' and Exists('$(StationeersPath)BepInEx\core\BepInEx.dll')">
-		<ProjectReference Include="SEGI.csproj" />
 		<Reference Include="BepInEx">
 			<HintPath>$(StationeersPath)BepInEx\core\BepInEx.dll</HintPath>
 			<SpecificVersion>False</SpecificVersion>

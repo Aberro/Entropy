@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-namespace Entropy.Assets.Scripts.Assets.Scripts.Utilities
+namespace Entropy.Scripts.Utilities
 {
     public static class AssetsManager
     {

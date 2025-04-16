@@ -2,7 +2,7 @@
 using HarmonyLib;
 using UnityEngine;
 
-namespace Entropy.Assets.Scripts.Patches
+namespace Entropy.Scripts.Patches
 {
 
 #if DISABLE

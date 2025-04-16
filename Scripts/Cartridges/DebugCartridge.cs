@@ -9,10 +9,10 @@ using TMPro;
 using UnityEngine;
 using Assets.Scripts.Objects.Electrical;
 using System.Linq;
-using Entropy.Assets.Scripts.Processor;
-using Entropy.Assets.Scripts.Utilities;
+using Entropy.Scripts.Processor;
+using Entropy.Scripts.Utilities;
 
-namespace Entropy.Assets.Scripts.Cartridges
+namespace Entropy.Scripts.Cartridges
 {
     public class DebugCartridge : Cartridge
     {

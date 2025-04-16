@@ -1,13 +1,10 @@
-﻿#nullable enable
-
-using BepInEx.Configuration;
-using System;
-using System.Collections.Generic;
+﻿using BepInEx.Configuration;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using BepInEx;
-using Entropy.Assets.Scripts.SEGI;
+using Entropy.Scripts.SEGI;
 
-namespace Entropy.Assets.Scripts
+namespace Entropy.Scripts
 {
     public class PluginConfigFile : ConfigFile
     {
@@ -313,14 +310,48 @@ namespace Entropy.Assets.Scripts
             Init();
         }
 
+        [MemberNotNull(nameof(CascadedSEGIEntry), 
+            nameof(SEGIPresetEntry),
+            nameof(SEGICascadedPresetEntry),
+            nameof(ConesEntry),
+            nameof(SecondaryConesEntry),
+            nameof(ConeTraceStepsEntry),
+            nameof(ConeLengthEntry),
+            nameof(ConeWidthEntry),
+            nameof(ConeTraceBiasEntry),
+            nameof(DoReflectionsEntry),
+            nameof(ReflectionStepsEntry),
+            nameof(ReflectionOcclusionPowerEntry),
+            nameof(SkyReflectionIntensityEntry),
+            nameof(VoxelResolutionEntry),
+            nameof(HalfResolutionEntry),
+            nameof(VoxelAAEntry),
+            nameof(StochasticSamplingEntry),
+            nameof(UseBilateralFilteringEntry),
+            nameof(TemporalBlendWeightEntry),
+            nameof(GaussianMipFilterEntry),
+            nameof(NearLightGainEntry),
+            nameof(GIGainEntry),
+            nameof(NearOcclusionStrengthEntry),
+            nameof(OcclusionPowerEntry),
+            nameof(OcclusionStrengthEntry),
+            nameof(FarOcclusionStrengthEntry),
+            nameof(FarthestOcclusionStrengthEntry),
+            nameof(InnerOcclusionLayersEntry),
+            nameof(InfiniteBouncesEntry),
+            nameof(SecondaryBounceGainEntry),
+            nameof(SecondaryOcclusionStrengthEntry),
+            nameof(SmallPumpPower),
+            nameof(LargePumpPower),
+            nameof(AirConditionerPower),
+            nameof(AirConditionerEfficiency))]
         private void Init()
         {
-            ConfigEntry<bool> feature = null;
             foreach (PatchCategory category in Enum.GetValues(typeof(PatchCategory)))
             {
                 if (category == PatchCategory.None)
                     continue;
-                if (!Features.TryGetValue(category, out feature))
+                if (!Features.TryGetValue(category, out var feature))
                 {
                     feature = Bind(category.GetDisplayName(), category.GetDisplayName() + " Enabled", false, category.GetDescription());
                     Features.Add(category, feature);

@@ -1,4 +1,4 @@
-﻿namespace Entropy.Assets.Scripts.UI
+﻿namespace Entropy.Scripts.Facades.UI
 {
     /// <summary>
     /// This is a simple facade for Wireframe component, to use it in the Unity project.

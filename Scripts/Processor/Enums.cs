@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Entropy.Assets.Scripts.Processor
+namespace Entropy.Scripts.Processor
 {
     public partial class ChipProcessor
     {

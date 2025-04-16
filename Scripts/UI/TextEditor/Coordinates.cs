@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics;
 
-namespace Entropy.Assets.Scripts.Assets.Scripts.UI.TextEditor
+namespace Entropy.Scripts.UI.TextEditor
 {
 	public struct Coordinates
 	{

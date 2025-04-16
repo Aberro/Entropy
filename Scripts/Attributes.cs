@@ -1,20 +1,18 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 
-namespace Entropy.Assets.Scripts
+namespace Entropy.Scripts;
+
+/// <summary>Annotation to define a category for use with PatchCategory</summary>
+///
+[AttributeUsage(AttributeTargets.Class)]
+public class HarmonyPatchCategory : HarmonyAttribute
 {
-    /// <summary>Annotation to define a category for use with PatchCategory</summary>
+    public PatchCategory Category { get; }
+    /// <summary>Annotation specifying the category</summary>
+    /// <param name="category">Name of patch category</param>
     ///
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class HarmonyPatchCategory : HarmonyAttribute
+    public HarmonyPatchCategory(PatchCategory category)
     {
-        public PatchCategory Category { get; }
-        /// <summary>Annotation specifying the category</summary>
-        /// <param name="category">Name of patch category</param>
-        ///
-        public HarmonyPatchCategory(PatchCategory category)
-        {
-            Category = category;
-        }
+        Category = category;
     }
 }

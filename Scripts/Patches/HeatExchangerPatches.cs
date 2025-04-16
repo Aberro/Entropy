@@ -3,7 +3,7 @@ using Assets.Scripts.Atmospherics;
 using Assets.Scripts.Objects.Pipes;
 using HarmonyLib;
 
-namespace Entropy.Assets.Scripts.Patches
+namespace Entropy.Scripts.Patches
 {
 
     [HarmonyPatch(typeof(HeatExchangerDeprecated), MethodType.Constructor)]

@@ -4,7 +4,7 @@ using Assets.Scripts.Objects.Pipes;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace Entropy.Assets.Scripts.Processor
+namespace Entropy.Scripts.Processor
 {
     public partial class ChipProcessor
     {

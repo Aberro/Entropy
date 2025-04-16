@@ -15,7 +15,7 @@ using System.Runtime.CompilerServices;
 using Entropy.Assets.Scripts.Assets.Scripts.Atmospherics;
 using Assets.Scripts;
 
-namespace Entropy.Assets.Scripts.Patches
+namespace Entropy.Scripts.Patches
 {
     [HarmonyPatch(typeof(DeviceAtmospherics), nameof(DeviceAtmospherics.OnAtmosphericTick))]
     public class DeviceAtmosphericsOnAtmosphericTickStub

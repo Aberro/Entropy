@@ -1,12 +1,12 @@
 ﻿using Assets.Scripts.Objects.Electrical;
 using Assets.Scripts.Objects.Motherboards;
 using Assets.Scripts.Objects.Pipes;
-using Entropy.Assets.Scripts.Utilities;
+using Entropy.Scripts.Utilities;
 using HarmonyLib;
 using JetBrains.Annotations;
 using Objects.Pipes;
 
-namespace Entropy.Assets.Scripts.Patches
+namespace Entropy.Scripts.Patches
 {
     public class DeviceAtmosphericsRegulator
     {

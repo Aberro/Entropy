@@ -18,7 +18,7 @@ using Assets.Scripts.Atmospherics;
 using Assets.Scripts.Objects;
 using Objects.Rockets;
 
-namespace Entropy.Assets.Scripts.Processor
+namespace Entropy.Scripts.Processor
 {
 	[SuppressMessage("ReSharper", "ForCanBeConvertedToForeach", Justification = "To avoid allocations")]
 	[SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery", Justification = "To avoid allocations")]

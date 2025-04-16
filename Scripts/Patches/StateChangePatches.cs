@@ -1,4 +1,4 @@
-﻿namespace Entropy.Assets.Scripts.Patches
+﻿namespace Entropy.Scripts.Patches
 {
     //[HarmonyPatch(typeof(Atmosphere), nameof(Atmosphere.StateChange))]
     //[HarmonyPatchCategory(PatchCategory.NoTrails)]

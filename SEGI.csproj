@@ -13,8 +13,7 @@
 		<Content Remove="**\*" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(StationeersPath)' != '' and Exists('$(StationeersPath)BepInEx\core\BepInEx.dll')">
-		<Compile Include="Scripts\SEGI\SEGIBehavior.cs" />
-		<Compile Include="Scripts\SEGI\SEGICascaded.cs" />
+		<Compile Include="Scripts\SEGI\Enums.cs" />
 		<Compile Include="Scripts\SEGI\SEGIPreset.cs" />
 		<Compile Include="Scripts\Utilities\AssetsManager.cs" />
 	</ItemGroup>

@@ -1,7 +1,7 @@
 ﻿using Assets.Scripts.Networks;
 using Assets.Scripts.Objects;
 using Assets.Scripts.Objects.Items;
-using Entropy.Assets.Scripts.Assets.Scripts.Utilities;
+using Entropy.Scripts.Utilities;
 using HarmonyLib;
 using System.Linq;
 using ImGuiNET.Unity;
@@ -9,11 +9,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using ImGuiNET;
-using Entropy.Assets.Scripts.Assets.Scripts.UI;
+using Entropy.Scripts.UI;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
-namespace Entropy.Assets.Scripts.Cartridges
+namespace Entropy.Scripts.Cartridges
 {
     [HarmonyPatch(typeof(Prefab), nameof(Prefab.LoadAll))]
     public class PrefabLoadAllPatch

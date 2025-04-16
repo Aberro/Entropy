@@ -1,10 +1,10 @@
 ﻿using Assets.Scripts.Util;
 using HarmonyLib;
 using UnityEngine;
-using Entropy.Assets.Scripts.SEGI;
+using Entropy.Scripts.SEGI;
 using Object = UnityEngine.Object;
 
-namespace Entropy.Assets.Scripts.Patches
+namespace Entropy.Scripts.Patches
 {
     [HarmonyPatch(typeof(ManagerBase), "ManagerAwake")]
     public class ManagerBase_ManagerAwake

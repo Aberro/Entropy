@@ -3,7 +3,7 @@ using HarmonyLib;
 using Assets.Scripts;
 using UnityEngine;
 
-namespace Entropy.Assets.Scripts.Patches
+namespace Entropy.Scripts.Patches
 {
     [HarmonyPatch(typeof(AtmosphericsManager), nameof(AtmosphericsManager.ManagerAwake))]
     [HarmonyPatchCategory(PatchCategory.SmallerParticles)]

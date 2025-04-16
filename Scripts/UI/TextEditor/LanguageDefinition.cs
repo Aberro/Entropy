@@ -1,10 +1,10 @@
 ﻿#nullable enable
-using Entropy.Assets.Scripts.Processor;
+using Entropy.Scripts.Processor;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Entropy.Assets.Scripts.Assets.Scripts.UI.TextEditor
+namespace Entropy.Scripts.UI.TextEditor
 {
 	using Identifiers = Dictionary<string, Identifier>;
 	using Keywords = HashSet<string>;

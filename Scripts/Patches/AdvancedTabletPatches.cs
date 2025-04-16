@@ -8,7 +8,7 @@ using HarmonyLib;
 using JetBrains.Annotations;
 using System;
 
-namespace Entropy.Assets.Scripts.Patches
+namespace Entropy.Scripts.Patches
 {
     /// <summary>
     /// A patch to allow writing to the mode logic.

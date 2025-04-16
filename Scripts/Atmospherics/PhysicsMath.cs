@@ -1,6 +1,6 @@
 ﻿using Assets.Scripts.Atmospherics;
 
-namespace Entropy.Assets.Scripts.Atmospherics
+namespace Entropy.Scripts.Atmospherics
 {
 	public static class PhysicsMath
 	{

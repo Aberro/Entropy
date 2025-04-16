@@ -2,12 +2,12 @@
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
-using Entropy.Assets.Scripts.Assets.Scripts.Utilities;
+using Entropy.Scripts.Utilities;
 using UnityEngine;
 using Util;
 using Object = UnityEngine.Object;
 
-namespace Entropy.Assets.Scripts.SEGI
+namespace Entropy.Scripts.SEGI
 {
     public class SEGIManager : MonoBehaviour
     {

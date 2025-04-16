@@ -1,7 +1,7 @@
 ﻿using Assets.Scripts.Objects.Electrical;
 using System.Xml.Serialization;
 
-namespace Entropy.Assets.Scripts.Processor
+namespace Entropy.Scripts.Processor
 {
     [XmlInclude(typeof(ProgrammableChipSaveData))]
     public class ChipProcessorSaveData : ProgrammableChipSaveData

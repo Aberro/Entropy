@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 using UnityEngine;
 using static Assets.Scripts.Atmospherics.Chemistry;
 
-namespace Entropy.Assets.Scripts.Patches
+namespace Entropy.Scripts.Patches
 {
 #if DISABLED
     [HarmonyPatch(typeof(AtmosphereHelper), nameof(AtmosphereHelper.CalculateThingEntropy))]

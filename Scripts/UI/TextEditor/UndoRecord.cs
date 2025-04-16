@@ -1,8 +1,8 @@
 ﻿#nullable enable
-using Entropy.Assets.Scripts.Assets.Scripts.UI.TextEditor;
+using Entropy.Scripts.UI.TextEditor;
 using System.Diagnostics;
 
-namespace Entropy.Assets.Scripts.UI.TextEditor
+namespace Entropy.Scripts.UI.TextEditor
 {
 	public partial class TextEditor
 	{

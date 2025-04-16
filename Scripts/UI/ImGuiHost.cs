@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Entropy.Assets.Scripts
+namespace Entropy.Scripts.UI
 {
 	public class ImGuiHost : MonoBehaviour
 	{

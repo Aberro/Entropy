@@ -3,14 +3,14 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Entropy.Assets.Scripts.Assets.Scripts.UI.TextEditor;
+using Entropy.Scripts.UI.TextEditor;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 using Debug = System.Diagnostics.Debug;
 
-namespace Entropy.Assets.Scripts.UI.TextEditor
+namespace Entropy.Scripts.UI.TextEditor
 {
 	using Line = List<Glyph>;
 	using Lines = List<List<Glyph>>;

@@ -3,11 +3,11 @@ using Assets.Scripts;
 using Assets.Scripts.Objects.Electrical;
 using Assets.Scripts.Objects.Motherboards;
 using Assets.Scripts.Util;
-using Entropy.Assets.Scripts.Utilities;
+using Entropy.Scripts.Utilities;
 using HarmonyLib;
 using UnityEngine;
 
-namespace Entropy.Assets.Scripts.Patches
+namespace Entropy.Scripts.Patches
 {
     public class VendingMachineSetting
     {

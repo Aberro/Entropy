@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace Entropy.Assets.Scripts.Assets.Scripts.UI.TextEditor
+namespace Entropy.Scripts.UI.TextEditor
 {
 	public struct Glyph
 	{

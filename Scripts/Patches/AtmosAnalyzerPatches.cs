@@ -9,7 +9,7 @@ using Assets.Scripts.Objects.Pipes;
 using HarmonyLib;
 using Networks;
 
-namespace Entropy.Assets.Scripts.Patches
+namespace Entropy.Scripts.Patches
 {
     /// <summary>
     /// A patch to see all internal atmospheres in devices that have more than one.

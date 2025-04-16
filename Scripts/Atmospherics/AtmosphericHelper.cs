@@ -5,7 +5,7 @@ using Assets.Scripts.Atmospherics;
 using Assets.Scripts.Util;
 using static Assets.Scripts.Atmospherics.AtmosphereHelper;
 
-namespace Entropy.Assets.Scripts.Atmospherics
+namespace Entropy.Scripts.Atmospherics
 {
 	public static class AtmosphericHelper
 	{

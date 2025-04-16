@@ -10,12 +10,12 @@ using Assets.Scripts.Objects.Motherboards;
 using Assets.Scripts.Objects.Pipes;
 using Assets.Scripts.Serialization;
 using Assets.Scripts.UI;
-using Entropy.Assets.Scripts.Utilities;
-using Entropy.Assets.Scripts.Processor;
+using Entropy.Scripts.Utilities;
+using Entropy.Scripts.Processor;
 using HarmonyLib;
 using System.Diagnostics;
 
-namespace Entropy.Assets.Scripts.Patches
+namespace Entropy.Scripts.Patches
 {
 	[HarmonyPatch(typeof(InputSourceCode), nameof(InputSourceCode.Initialize))]
 	[HarmonyPatchCategory(PatchCategory.ProgrammableChipPatches)]

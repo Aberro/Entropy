@@ -1,9 +1,10 @@
 ﻿using Assets.Scripts.Objects.Motherboards;
+using Entropy.Scripts.UI;
 using HarmonyLib;
 using ImGuiNET;
 using ImGuiNET.Unity;
 
-namespace Entropy.Assets.Scripts.Assets.Scripts.Patches
+namespace Entropy.Scripts.Patches
 {
 	[HarmonyPatch(typeof(ProgrammableChipMotherboard), nameof(ProgrammableChipMotherboard.OnEdit))]
 	[HarmonyPatchCategory(PatchCategory.ProgrammableChipPatches)]
