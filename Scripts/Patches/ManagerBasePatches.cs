@@ -1,7 +1,6 @@
 ﻿using Assets.Scripts.Util;
 using HarmonyLib;
 using UnityEngine;
-using Entropy.Scripts.SEGI;
 using Object = UnityEngine.Object;
 
 namespace Entropy.Scripts.Patches;
@@ -15,8 +14,6 @@ public class ManagerBase_ManagerAwake
 		if (Initialized)
 			return;
 		Plugin.Log("EntryPoint initialization...");
-		if (Plugin.Config.Features[PatchCategory.SEGI].Value)
-			SEGIManager.Enable();
 		var man = Object.FindObjectOfType<ConfigurationManager.ConfigurationManager>();
 		if (man == null)
 		{

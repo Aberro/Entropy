@@ -34,9 +34,6 @@ public enum PatchCategory
     [DisplayName("Atmospherics regulation")]
     [Description("Allows to set Power and Volume logic value to atmospheric devices with pumps to limit pumping and allow passive pressure regulator.")]
     AtmosphericRegulatorPatches,
-    [DisplayName("SEGI")]
-    [Description("Enables SonicEther Global Illumination.")]
-    SEGI,
     [DisplayName("No incorrect matter state")]
     [Description("Disables incorrect matter state damage to pipes. Frozen matter will reduce pipe volume instead.")]
     NoIncorrectMatterState,

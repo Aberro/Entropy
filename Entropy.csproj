@@ -40,11 +40,6 @@
 				<Content Remove="UnityAssetsProject\**\*" />
 				<Compile Remove="Scripts\Facades\MemberNotNullWhenAttribute.cs" />
 				<Compile Remove="Scripts\Facades\MemberNotNullAttribute.cs" />
-				<Compile Remove="Scripts\SEGI\Enums.cs" />
-				<Compile Remove="Scripts\SEGI\SEGI.cs" />
-				<Compile Remove="Scripts\SEGI\SEGICascaded.cs" />
-				<Compile Remove="Scripts\SEGI\SEGIBehavior.cs" />
-				<Compile Remove="Scripts\SEGI\SEGIPreset.cs" />
 				<Compile Remove="Scripts\Cartridges\DebugCartridge.cs" />
 				<Compile Remove="Scripts\Utilities\AssetsManager.cs" />
 				<Compile Remove="Scripts\Utilities\ClassExtension.cs" />
@@ -188,7 +183,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="SEGI.csproj" />
+	  <ProjectReference Include="Entropy.Unity.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
