@@ -74,7 +74,16 @@ public class Plugin : BaseUnityPlugin
         AssetsManager.Unload();
     }
 
-    private static void Configure()
+	public void OnDestroy()
+	{
+	}
+
+	public void Update()
+	{
+
+	}
+
+	private static void Configure()
     {
         foreach (PatchCategory category in Enum.GetValues(typeof(PatchCategory)))
         {
@@ -105,9 +114,17 @@ public class Plugin : BaseUnityPlugin
                 }
             }
         }
-        if (Config.Features[PatchCategory.SEGI].Value)
-            SEGIManager.Enable();
-        else
-            SEGIManager.Disable();
-    }
+
+		if(Config.Features[PatchCategory.SEGI].Value)
+		{
+			//SEGIManager.Enable();
+			var lightmapsMode = LightmapSettings.lightmapsMode;
+			var lightmapsModeLegacy = LightmapSettings.lightmapsModeLegacy;
+			var lightProbes = LightmapSettings.lightProbes;
+			var lightmaps = LightmapSettings.lightmaps;
+		}
+		else
+			SEGIManager.Disable();
+
+	}
 }

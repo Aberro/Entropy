@@ -192,7 +192,7 @@ public class SEGICascadedEditor : Editor
 			EditorGUILayout.PropertyField(followTransform, new GUIContent("Follow Transform", "If provided, the voxel volume will follow and be centered on this object instead of the camera. Useful for top-down scenes."));
 			EditorGUILayout.EndVertical();
 			EditorGUILayout.Space();
-			EditorGUILayout.LabelField("VRAM Usage: " + instance.vramUsage.ToString("F2") + " MB", vramLabelStyle);
+			EditorGUILayout.LabelField("VRAM Usage: " + instance.VRAMUsage.ToString("F2") + " MB", vramLabelStyle);
 			EditorGUI.indentLevel--;
 		}
 

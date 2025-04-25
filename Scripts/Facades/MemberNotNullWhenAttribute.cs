@@ -1,4 +1,5 @@
-﻿
+﻿namespace System.Diagnostics.CodeAnalysis;
+
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
 public sealed class MemberNotNullWhenAttribute : Attribute
 {

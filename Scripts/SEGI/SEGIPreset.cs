@@ -55,7 +55,6 @@ public class SEGIPreset : ScriptableObject
 	public int secondaryCones = 6;
 	[Range(0.1f, 4.0f)]
 	public float secondaryOcclusionStrength = 1.0f;
-	[Range(64, 4096)]
 	public ShadowMapResolution sunShadowResolution = ShadowMapResolution.medium;
 	[Range(1f, 20f)]
 	public float shadowSpaceDepthRatio = 10.0f;

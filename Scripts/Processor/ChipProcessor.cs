@@ -454,7 +454,7 @@ namespace Entropy.Scripts.Processor
 			}
 			catch(ProgrammableChipException e)
 			{
-#if DEBUG
+#if DEBUG && !SEGI
 				Plugin.LogWarning("Error while compiling the script: \n" + e);
 #endif
 				return new InvalidProcessor(chip, e);

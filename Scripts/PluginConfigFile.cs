@@ -22,7 +22,10 @@ namespace Entropy.Scripts
             [DisplayName("Voxel resolution")]
             [Description("Higher resolutions are more accurate, but require more memory expensive.")]
             VoxelResolution,
-            [DisplayName("Voxel antialiasing")]
+			[DisplayName("Shadow map resolution")]
+			[Description("Higher resolutions are more accurate, but require more memory expensive.")]
+			ShadowMapResolution,
+			[DisplayName("Voxel antialiasing")]
             [Description("Smooths out the edges of global illumination voxels.")]
             VoxelAA,
             [DisplayName("Inner occlusion layers")]
@@ -101,13 +104,14 @@ namespace Entropy.Scripts
             [Description("Amount of heat power per electricity power consumption under ideal conditions.")]
             AirConditionerEfficiency,
         }
-        public Dictionary<PatchCategory, ConfigEntry<bool>> Features { get; } = new();
+		public Dictionary<PatchCategory, ConfigEntry<bool>> Features { get; } = [];
 
         public ConfigEntry<bool> CascadedSEGIEntry;
         public ConfigEntry<SEGIManager.SettingPreset> SEGIPresetEntry;
         public ConfigEntry<SEGIManager.SettingCascadedPreset> SEGICascadedPresetEntry;
-        public ConfigEntry<SEGIBehavior.VoxelResolution> VoxelResolutionEntry;
-        public ConfigEntry<bool> VoxelAAEntry;
+        public ConfigEntry<VoxelResolution> VoxelResolutionEntry;
+		public ConfigEntry<ShadowMapResolution> ShadowMapResolutionEntry;
+		public ConfigEntry<bool> VoxelAAEntry;
         public ConfigEntry<int> InnerOcclusionLayersEntry;
         public ConfigEntry<bool> InfiniteBouncesEntry;
         public ConfigEntry<float> TemporalBlendWeightEntry;
@@ -151,12 +155,17 @@ namespace Entropy.Scripts
             get => this.SEGICascadedPresetEntry.Value;
             set => this.SEGICascadedPresetEntry.Value = value;
         }
-        public SEGIBehavior.VoxelResolution VoxelResolution
+        public VoxelResolution VoxelResolution
         {
             get => this.VoxelResolutionEntry.Value;
             set => this.VoxelResolutionEntry.Value = value;
-        }
-        public bool VoxelAA
+		}
+		public ShadowMapResolution ShadowMapResolution
+		{
+			get => this.ShadowMapResolutionEntry.Value;
+			set => this.ShadowMapResolutionEntry.Value = value;
+		}
+		public bool VoxelAA
         {
             get => this.VoxelAAEntry.Value;
             set => this.VoxelAAEntry.Value = value;
@@ -324,7 +333,8 @@ namespace Entropy.Scripts
             nameof(ReflectionOcclusionPowerEntry),
             nameof(SkyReflectionIntensityEntry),
             nameof(VoxelResolutionEntry),
-            nameof(HalfResolutionEntry),
+			nameof(ShadowMapResolutionEntry),
+			nameof(HalfResolutionEntry),
             nameof(VoxelAAEntry),
             nameof(StochasticSamplingEntry),
             nameof(UseBilateralFilteringEntry),
@@ -373,8 +383,9 @@ namespace Entropy.Scripts
             this.ReflectionOcclusionPowerEntry = BindSEGI(ConfigEntry.ReflectionOcclusionPower, 1f, 0.001f, 4.0f);
             this.SkyReflectionIntensityEntry = BindSEGI(ConfigEntry.SkyReflectionIntensity, 1f, 0.0f, 1.0f);
 
-            this.VoxelResolutionEntry = BindSEGI(ConfigEntry.VoxelResolution, SEGIBehavior.VoxelResolution.high);
-            this.HalfResolutionEntry = BindSEGI(ConfigEntry.HalfResolution, true);
+            this.VoxelResolutionEntry = BindSEGI(ConfigEntry.VoxelResolution, VoxelResolution.medium);
+			this.ShadowMapResolutionEntry = BindSEGI(ConfigEntry.ShadowMapResolution, ShadowMapResolution.medium);
+			this.HalfResolutionEntry = BindSEGI(ConfigEntry.HalfResolution, true);
             this.VoxelAAEntry = BindSEGI(ConfigEntry.VoxelAA, false);
             this.StochasticSamplingEntry = BindSEGI(ConfigEntry.StochasticSampling, true);
             this.UseBilateralFilteringEntry = BindSEGI(ConfigEntry.UseBilateralFiltering, true);

@@ -9,4 +9,10 @@
             <Value>Debug Cartridge</Value>
         </RecordThing>
     </Things>
+	<Interface>
+		<Record>
+			<Key>SettingsMenuModSettings</Key>
+			<Value>Mod Settings</Value>
+		</Record>
+	</Interface>
 </Language>

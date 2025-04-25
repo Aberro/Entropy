@@ -22,11 +22,15 @@
 			</ItemGroup>
 			<ItemGroup Condition="'$(StationeersPath)' == ''">
 				<!-- Check for local.props -->
-				<Compile Include="ERROR local.props file not found. Read README.md" />
+				<None Include="ERROR local.props file not found. Read README.md" />
 			</ItemGroup>
 			<ItemGroup Condition="'$(StationeersPath)' != '' and !Exists('$(StationeersPath)BepInEx\core\BepInEx.dll')">
 				<!-- Check if the game is modded (required for proper references)-->
-				<Compile Include="ERROR Your Stationeers isn't modded. Please, install BepInEx into the game before loading this project." />
+				<None Include="ERROR Your Stationeers isn't modded. Please, install BepInEx into the game before loading this project." />
+			</ItemGroup>
+			<ItemGroup Condition="'$(UnityPath)' != '' and !Exists('$(UnityPath)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\WindowsPlayer.exe')">
+				<!-- Check for local.props -->
+				<None Include="ERROR UnityPath in local.props has incorrect value, can't find Unity files." />
 			</ItemGroup>
 		</When>
 		<Otherwise>
@@ -34,6 +38,20 @@
 				<None Remove="UnityAssetsProject\**\*" />
 				<Compile Remove="UnityAssetsProject\**\*" />
 				<Content Remove="UnityAssetsProject\**\*" />
+				<Compile Remove="Scripts\Facades\MemberNotNullWhenAttribute.cs" />
+				<Compile Remove="Scripts\Facades\MemberNotNullAttribute.cs" />
+				<Compile Remove="Scripts\SEGI\Enums.cs" />
+				<Compile Remove="Scripts\SEGI\SEGI.cs" />
+				<Compile Remove="Scripts\SEGI\SEGICascaded.cs" />
+				<Compile Remove="Scripts\SEGI\SEGIBehavior.cs" />
+				<Compile Remove="Scripts\SEGI\SEGIPreset.cs" />
+				<Compile Remove="Scripts\Cartridges\DebugCartridge.cs" />
+				<Compile Remove="Scripts\Utilities\AssetsManager.cs" />
+				<Compile Remove="Scripts\Utilities\ClassExtension.cs" />
+				<Compile Remove="Scripts\Utilities\UnityHelper.cs" />
+				<Compile Remove="Scripts\Processor\*.cs" />
+				<Compile Remove="Scripts\MIPSParser\*.cs" />
+				<Compile Remove="Scripts\UI\ImGuiHost.cs" />
 			</ItemGroup>
 		</Otherwise>
 	</Choose>
@@ -118,6 +136,11 @@
 			<SpecificVersion>False</SpecificVersion>
 			<Private>False</Private>
 		</Reference>
+		<Reference Include="UnityEngine.InputLegacyModule">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
 		<Reference Include="RG.ImGui">
 			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\RG.ImGui.dll</HintPath>
 			<SpecificVersion>False</SpecificVersion>
@@ -145,12 +168,12 @@
 		</Reference>
 
 		<Reference Include="Antlr4.Runtime.Standard">
-			<HintPath>GameData\Antlr4.Runtime.Standard.dll</HintPath>
+			<HintPath>Exports\GameData\Antlr4.Runtime.Standard.dll</HintPath>
 			<SpecificVersion>False</SpecificVersion>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="ConfigurationManager">
-			<HintPath>GameData\ConfigurationManager.dll</HintPath>
+			<HintPath>Exports\GameData\ConfigurationManager.dll</HintPath>
 			<SpecificVersion>False</SpecificVersion>
 			<Private>False</Private>
 		</Reference>
@@ -161,9 +184,22 @@
 		<AssetBundles Include="UnityAssetsProject\AssetBundles\**\*" />
 		<UnityAssets Include="UnityAssetsProject\Assets\**\*" />
 		<UnityAssets Remove="*.meta" />
-		<ModFiles Include="$(OutputPath)\**\*"/>
+		<ModFiles Include="$(OutputPath)\**\*" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="SEGI.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Scripts\Cartridges\" />
+	</ItemGroup>
+
+	<Target Name="SwitchToDebug" BeforeTargets="Build" Condition="Exists('$(UnityPath)Unity.exe')">
+		<Copy SourceFiles="$(UnityPath)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\WindowsPlayer.exe" DestinationFiles="$(StationeersPath)rocketstation.exe" SkipUnchangedFiles="false" />
+		<Copy SourceFiles="$(UnityPath)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\UnityPlayer.dll" DestinationFiles="$(StationeersPath)UnityPlayer.dll" SkipUnchangedFiles="false" />
+		<Copy SourceFiles="$(UnityPath)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\WinPixEventRuntime.dll" DestinationFiles="$(StationeersPath)WinPixEventRuntime.dll" SkipUnchangedFiles="false" />
+	</Target>
 	<Target Name="AssembleFiles" AfterTargets="Build">
 		<Message Text="Copying the files to output directory..." Importance="High" />
 		<Copy SourceFiles="@(ExportsToCopy)" DestinationFiles="@(ExportsToCopy->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
