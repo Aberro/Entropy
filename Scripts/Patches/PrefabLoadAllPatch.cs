@@ -1,13 +1,13 @@
-﻿using Assets.Scripts.Networks;
+﻿using UnityEngine;
+using Assets.Scripts.Networks;
 using Assets.Scripts.Objects;
 using Assets.Scripts.Objects.Items;
-using Entropy.Scripts.Utilities;
-using HarmonyLib;
 using ImGuiNET.Unity;
-using UnityEngine;
-using Entropy.Scripts.UI;
-using Object = UnityEngine.Object;
+using HarmonyLib;
 using Entropy.Scripts.Cartridges;
+using Entropy.Scripts.UI;
+using Entropy.Scripts.Utilities;
+using Object = UnityEngine.Object;
 
 namespace Entropy.Scripts.Patches;
 
@@ -24,22 +24,22 @@ public class PrefabLoadAllPatch
 	private static void PrepareImGui()
 	{
 		var prefab = AssetsManager.LoadAsset<GameObject>("Assets/Prefabs/ImGui.prefab");
-		var component = prefab?.GetComponent<DearImGui>();
-		if(!prefab.IsValid() || !component.IsValid())
+		var dearImGui = prefab?.GetComponent<DearImGui>();
+		if(!prefab.IsValid() || !dearImGui.IsValid())
 			throw new ApplicationException("Could not find ImGui.prefab asset!");
 
 		var fontAtlasConfigAsset = Resources.FindObjectsOfTypeAll<FontAtlasConfigAsset>().FirstOrDefault();
 		var cursorShapesAsset = Resources.FindObjectsOfTypeAll<CursorShapesAsset>().FirstOrDefault();
 		var shaderResourcesAsset = Resources.FindObjectsOfTypeAll<ShaderResourcesAsset>().FirstOrDefault();
 
-		var imGuiTraverse = new Traverse(component);
-		// Modify the preset before instantiating to reuse default resources from the dll.
+		var dearImGuiTraverse = new Traverse(dearImGui);
+		// Modify the preset before instantiating to reuse default resources from the game's dll.
 		if(fontAtlasConfigAsset != null)
-			imGuiTraverse.Field("_fontAtlasConfiguration")?.SetValue(fontAtlasConfigAsset);
+			dearImGuiTraverse.Field("_fontAtlasConfiguration")?.SetValue(fontAtlasConfigAsset);
 		if(cursorShapesAsset != null)
-			imGuiTraverse.Field("_cursorShapes")?.SetValue(cursorShapesAsset);
+			dearImGuiTraverse.Field("_cursorShapes")?.SetValue(cursorShapesAsset);
 		if(shaderResourcesAsset != null)
-			imGuiTraverse.Field("_shaders")?.SetValue(shaderResourcesAsset);
+			dearImGuiTraverse.Field("_shaders")?.SetValue(shaderResourcesAsset);
 
 		var instance = Object.Instantiate(prefab)!;
 		instance.name = prefab.name;

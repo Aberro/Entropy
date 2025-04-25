@@ -1,11 +1,11 @@
 #nullable enable
-using Entropy.Scripts.Utilities;
-using ImGuiNET;
-using ImGuiNET.Unity;
-using JetBrains.Annotations;
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UI;
+using ImGuiNET;
+using ImGuiNET.Unity;
+using Entropy.Scripts.Utilities;
 
 namespace Entropy.Scripts.UI;
 
@@ -93,14 +93,20 @@ public class ImGuiWindow : IDisposable
 	public ImGuiWindow(string name, ref bool open)
 	{
 		this.windowName = name;
-		ImGui.Begin(name, ref open);
+		if(open)
+		{
+			ImGui.Begin(name, ref open);
+		}
 		this.opened = open;
 	}
 
 	public ImGuiWindow(string name, ref bool open, ImGuiWindowFlags flags)
 	{
 		this.windowName = name;
-		ImGui.Begin(name, ref open, flags);
+		if(open)
+		{
+			ImGui.Begin(name, ref open, flags);
+		}
 		this.opened = open;
 	}
 

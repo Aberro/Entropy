@@ -1,12 +1,11 @@
-﻿using BepInEx.Configuration;
+﻿using JetBrains.Annotations;
 using UnityEngine;
-using ImGuiNET;
-using JetBrains.Annotations;
-using UnityEngine.SceneManagement;
-using Entropy.Scripts.Utilities;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using ImGuiNET;
 using Assets.Scripts.UI;
-using UnityEngine.EventSystems;
+using BepInEx.Configuration;
+using Entropy.Scripts.Utilities;
 
 namespace Entropy.Scripts.UI;
 
@@ -23,7 +22,6 @@ public class ModSettings : MonoBehaviour
 	{
 		ImGuiUn.Layout += OnLayout;
 		SceneManager.sceneLoaded += OnSceneLoaded;
-		GetComponent<Canvas>().sortingOrder = 32000;
 		OnSceneLoaded(SceneManager.GetActiveScene(), SceneManager.loadedSceneCount > 0 ? LoadSceneMode.Single : LoadSceneMode.Additive);
 	}
 
