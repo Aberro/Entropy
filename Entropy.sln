@@ -5,8 +5,6 @@ VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entropy", "Entropy.csproj", "{BBC020CE-3ADC-4320-A4CC-1827E45AB7DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entropy.Unity", "Entropy.Unity.csproj", "{20A50F38-03EB-88C5-06D9-36324EC07CF6}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{BBC020CE-3ADC-4320-A4CC-1827E45AB7DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBC020CE-3ADC-4320-A4CC-1827E45AB7DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBC020CE-3ADC-4320-A4CC-1827E45AB7DF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{20A50F38-03EB-88C5-06D9-36324EC07CF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{20A50F38-03EB-88C5-06D9-36324EC07CF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{20A50F38-03EB-88C5-06D9-36324EC07CF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{20A50F38-03EB-88C5-06D9-36324EC07CF6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

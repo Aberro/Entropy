@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace System.ComponentModel;
 
-namespace System.ComponentModel
+/// <summary>
+/// A simple facade for actual DisplayNameAttribute, to apply it to enum values.
+/// </summary>
+public class DisplayNameAttribute : Attribute
 {
-    public class DisplayNameAttribute : Attribute
-    {
-        public string DisplayName { get; }
+    public string DisplayName { get; }
 
-        public DisplayNameAttribute(string displayName)
-        {
-            DisplayName = displayName;
-        }
+    public DisplayNameAttribute(string displayName)
+    {
+        DisplayName = displayName;
     }
 }

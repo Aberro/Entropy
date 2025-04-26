@@ -43,7 +43,7 @@ public class ModSettings : MonoBehaviour
 			var buttonAudio = buttonGrid?.Find("ButtonAudio");
 
 			if(!buttonAudio.IsValid())
-				Plugin.LogWarning("Game UI has updated, cannot add \"Mod settings\" button!");
+				EntropyPlugin.LogWarning("Game UI has updated, cannot add \"Mod settings\" button!");
 			var buttonModSettings = Instantiate(buttonAudio, buttonAudio!.transform.parent)!;
 
 			var buttonText = buttonModSettings.Find("ButtonText");
@@ -128,12 +128,12 @@ public class ModSettings : MonoBehaviour
 					var categoryName = category.GetDisplayName();
 					if(ImGui.CollapsingHeader(categoryName))
 					{
-						var enabled = Plugin.Config.Features[category].Value;
+						var enabled = EntropyPlugin.Config.Features[category].Value;
 						ImGui.Checkbox("Enabled", ref enabled);
-						Plugin.Config.Features[category].Value = enabled;
-						foreach(var config in Plugin.Config)
+						EntropyPlugin.Config.Features[category].Value = enabled;
+						foreach(var config in EntropyPlugin.Config)
 						{
-							if ((config.Value is ConfigEntry<bool> entry && Plugin.Config.Features.ContainsValue(entry)) || config.Key.Section != categoryName)
+							if ((config.Value is ConfigEntry<bool> entry && EntropyPlugin.Config.Features.ContainsValue(entry)) || config.Key.Section != categoryName)
 								continue;
 							if(config.Value is ConfigEntry<bool> boolEntry)
 							{

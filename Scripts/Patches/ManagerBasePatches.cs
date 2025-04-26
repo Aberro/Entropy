@@ -13,14 +13,14 @@ public class ManagerBase_ManagerAwake
 	{
 		if (Initialized)
 			return;
-		Plugin.Log("EntryPoint initialization...");
+		EntropyPlugin.Log("EntryPoint initialization...");
 		var man = Object.FindObjectOfType<ConfigurationManager.ConfigurationManager>();
 		if (man == null)
 		{
 			var go = new GameObject("@@ConfigurationManager");
 			Object.DontDestroyOnLoad(go);
 			go.AddComponent<ConfigurationManager.ConfigurationManager>();
-			Plugin.Log("Configuration Manager not found, creating a new one");
+			EntropyPlugin.Log("Configuration Manager not found, creating a new one");
 		}
 		Initialized = true;
 	}

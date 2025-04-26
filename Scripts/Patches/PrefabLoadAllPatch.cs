@@ -8,6 +8,7 @@ using Entropy.Scripts.Cartridges;
 using Entropy.Scripts.UI;
 using Entropy.Scripts.Utilities;
 using Object = UnityEngine.Object;
+using UnityEngine.UI;
 
 namespace Entropy.Scripts.Patches;
 
@@ -16,36 +17,10 @@ public class PrefabLoadAllPatch
 {
 	public static void Postfix()
 	{
-		if(Plugin.Config.Features[PatchCategory.ConfigCartridgeDebug].Value)
+		ImGuiHost.Init();
+		ImGuiHost.Instance.GetOrAddComponent<ModSettings>();
+		if(EntropyPlugin.Config.Features[PatchCategory.ConfigCartridgeDebug].Value)
 			PrepareDebugCartridge();
-		PrepareImGui();
-	}
-
-	private static void PrepareImGui()
-	{
-		var prefab = AssetsManager.LoadAsset<GameObject>("Assets/Prefabs/ImGui.prefab");
-		var dearImGui = prefab?.GetComponent<DearImGui>();
-		if(!prefab.IsValid() || !dearImGui.IsValid())
-			throw new ApplicationException("Could not find ImGui.prefab asset!");
-
-		var fontAtlasConfigAsset = Resources.FindObjectsOfTypeAll<FontAtlasConfigAsset>().FirstOrDefault();
-		var cursorShapesAsset = Resources.FindObjectsOfTypeAll<CursorShapesAsset>().FirstOrDefault();
-		var shaderResourcesAsset = Resources.FindObjectsOfTypeAll<ShaderResourcesAsset>().FirstOrDefault();
-
-		var dearImGuiTraverse = new Traverse(dearImGui);
-		// Modify the preset before instantiating to reuse default resources from the game's dll.
-		if(fontAtlasConfigAsset != null)
-			dearImGuiTraverse.Field("_fontAtlasConfiguration")?.SetValue(fontAtlasConfigAsset);
-		if(cursorShapesAsset != null)
-			dearImGuiTraverse.Field("_cursorShapes")?.SetValue(cursorShapesAsset);
-		if(shaderResourcesAsset != null)
-			dearImGuiTraverse.Field("_shaders")?.SetValue(shaderResourcesAsset);
-
-		var instance = Object.Instantiate(prefab)!;
-		instance.name = prefab.name;
-
-		Object.DontDestroyOnLoad(instance);
-		instance.AddComponent<ModSettings>();
 	}
 
 	private static void PrepareDebugCartridge()
@@ -66,12 +41,6 @@ public class PrefabLoadAllPatch
 		Prefab.AllPrefabs.Add(copy.GetComponent<ConfigCartridge>());
 		Cartridge.AllCartridgePrefabs.Add(copy.GetComponent<ConfigCartridge>());
 		WorldManager.Instance.SourcePrefabs.Add(copy.GetComponent<ConfigCartridge>());
-
-		var prefab = AssetsManager.LoadAsset<GameObject>("Assets/Prefabs/CartridgeDebug.prefab");
-		var component = prefab.GetComponent<DebugCartridge>();
-		component.PrefabHash = Animator.StringToHash(component.PrefabName);
-		Prefab.AllPrefabs.Add(component);
-		WorldManager.Instance.SourcePrefabs.Add(component);
 	}
 }
 

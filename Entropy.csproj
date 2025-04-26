@@ -34,20 +34,6 @@
 			</ItemGroup>
 		</When>
 		<Otherwise>
-			<ItemGroup>
-				<None Remove="UnityAssetsProject\**\*" />
-				<Compile Remove="UnityAssetsProject\**\*" />
-				<Content Remove="UnityAssetsProject\**\*" />
-				<Compile Remove="Scripts\Facades\MemberNotNullWhenAttribute.cs" />
-				<Compile Remove="Scripts\Facades\MemberNotNullAttribute.cs" />
-				<Compile Remove="Scripts\Cartridges\DebugCartridge.cs" />
-				<Compile Remove="Scripts\Utilities\AssetsManager.cs" />
-				<Compile Remove="Scripts\Utilities\ClassExtension.cs" />
-				<Compile Remove="Scripts\Utilities\UnityHelper.cs" />
-				<Compile Remove="Scripts\Processor\*.cs" />
-				<Compile Remove="Scripts\MIPSParser\*.cs" />
-				<Compile Remove="Scripts\UI\ImGuiHost.cs" />
-			</ItemGroup>
 		</Otherwise>
 	</Choose>
 	<ItemGroup Condition="'$(StationeersPath)' != '' and Exists('$(StationeersPath)BepInEx\core\BepInEx.dll')">
@@ -176,14 +162,7 @@
 
 	<ItemGroup>
 		<ExportsToCopy Include="Exports\**\*" />
-		<AssetBundles Include="UnityAssetsProject\AssetBundles\**\*" />
-		<UnityAssets Include="UnityAssetsProject\Assets\**\*" />
-		<UnityAssets Remove="*.meta" />
 		<ModFiles Include="$(OutputPath)\**\*" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="Entropy.Unity.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -198,7 +177,6 @@
 	<Target Name="AssembleFiles" AfterTargets="Build">
 		<Message Text="Copying the files to output directory..." Importance="High" />
 		<Copy SourceFiles="@(ExportsToCopy)" DestinationFiles="@(ExportsToCopy->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
-		<Copy SourceFiles="@(AssetBundles)" DestinationFiles="@(AssetBundles->'$(OutputPath)Content\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
 	</Target>
 	<Target Name="ExportMod" AfterTargets="AssembleFiles" Condition="'$(InstallMods)' == 'true'">
 		<Message Text="Copying the files to Stationeers mod directory..." Importance="High" />

@@ -1,9 +1,8 @@
-﻿namespace Entropy.Scripts.Facades.UI
+﻿namespace Entropy.Scripts.Facades.UI;
+
+/// <summary>
+/// This is a simple facade for Wireframe component, to use it in the Unity project.
+/// </summary>
+internal class Wireframe : global::Assets.Scripts.UI.Wireframe
 {
-    /// <summary>
-    /// This is a simple facade for Wireframe component, to use it in the Unity project.
-    /// </summary>
-    internal class Wireframe : global::Assets.Scripts.UI.Wireframe
-    {
-    }
 }

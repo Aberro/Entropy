@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel;
 
 namespace Entropy.Scripts;
+#pragma warning disable CS0436 // Type conflicts with imported type
 public enum PatchCategory
 {
     None,
-    [DisplayName("Advanced Tablet writeable Mode")]
-    [Description("Enables writing Mode logic value into Advanced Tablet to switch between cartridges.")]
+	[DisplayName("Advanced Tablet writeable Mode")]
+	[Description("Enables writing Mode logic value into Advanced Tablet to switch between cartridges.")]
     AdvancedTabletWriteableMode,
     [DisplayName("Advanced Tablet IC Fix")]
     [Description("Stops IC execution when Advanced Tablet is off.")]
@@ -31,8 +32,8 @@ public enum PatchCategory
     [DisplayName("Atmospheric patches")]
     [Description("Changes gas/liquid devices more physical.")]
     AtmosphericPatches,
-    [DisplayName("Atmospherics regulation")]
-    [Description("Allows to set Power and Volume logic value to atmospheric devices with pumps to limit pumping and allow passive pressure regulator.")]
+    [DisplayName("Atmospherics logic regulation")]
+    [Description("Allows to set Power and Volume logic network values to atmospheric devices with pumps to programmatically limit pumping capacity.")]
     AtmosphericRegulatorPatches,
     [DisplayName("No incorrect matter state")]
     [Description("Disables incorrect matter state damage to pipes. Frozen matter will reduce pipe volume instead.")]
@@ -43,7 +44,8 @@ public enum PatchCategory
     [DisplayName("Programmable chip replacement")]
     [Description("Replaces programmable chip command processor with a modded, more optimized version.")]
     ProgrammableChipReplacement,
-    //[DisplayName("Realistic state change")]
-    //[Description("Makes state change physics more realistic. Evaporation, condensation and solidification depends only on energy balance, no more superheated or supercooled liquids/gases.")]
-    //StateChangePatches,
+	//[DisplayName("Realistic state change")]
+	//[Description("Makes state change physics more realistic. Evaporation, condensation and solidification depends only on energy balance, no more superheated or supercooled liquids/gases.")]
+	//StateChangePatches,
 }
+#pragma warning restore CS0436 // Type conflicts with imported type

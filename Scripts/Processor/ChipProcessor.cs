@@ -454,9 +454,7 @@ namespace Entropy.Scripts.Processor
 			}
 			catch(ProgrammableChipException e)
 			{
-#if DEBUG && !UNITY
-				Plugin.LogWarning("Error while compiling the script: \n" + e);
-#endif
+				EntropyPlugin.LogWarning("Error while compiling the script: \n" + e);
 				return new InvalidProcessor(chip, e);
 			}
 			return new InvalidProcessor(chip, new ProgrammableChipException(ProgrammableChipException.ICExceptionType.None, 0));

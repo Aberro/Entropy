@@ -23,13 +23,13 @@ namespace Entropy.Scripts.Patches
 	{
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			Plugin.Log("Applying transpilation to Initialize method...");
+			EntropyPlugin.Log("Applying transpilation to Initialize method...");
 			foreach (var instruction in instructions)
 			{
 				if (instruction.operand is 128) instruction.operand = 1024;
 				yield return instruction;
 			}
-			Plugin.Log("Initialize method is updated.");
+			EntropyPlugin.Log("Initialize method is updated.");
 		}
 	}
 
@@ -39,13 +39,13 @@ namespace Entropy.Scripts.Patches
 	{
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			Plugin.Log("Applying transpilation to RemoveLine method...");
+			EntropyPlugin.Log("Applying transpilation to RemoveLine method...");
 			foreach (var instruction in instructions)
 			{
 				if (instruction.operand is 128) instruction.operand = 1024;
 				yield return instruction;
 			}
-			Plugin.Log("RemoveLine method is updated.");
+			EntropyPlugin.Log("RemoveLine method is updated.");
 		}
 	}
 
@@ -55,7 +55,7 @@ namespace Entropy.Scripts.Patches
 	{
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			Plugin.Log("Applying transpilation to HandleInput method...");
+			EntropyPlugin.Log("Applying transpilation to HandleInput method...");
 			// Here we need to look forward, so...
 			CodeInstruction prevInstruction = null;
 			bool replace = true;
@@ -74,7 +74,7 @@ namespace Entropy.Scripts.Patches
 				prevInstruction = instruction;
 			}
 			yield return prevInstruction;
-			Plugin.Log("HandleInput method is updated.");
+			EntropyPlugin.Log("HandleInput method is updated.");
 		}
 	}
 
