@@ -6,6 +6,9 @@ using Assets.Scripts.Objects.Motherboards;
 using Cysharp.Threading.Tasks;
 using HarmonyLib;
 using JetBrains.Annotations;
+using Entropy.Attributes;
+using Entropy.Enums;
+using Entropy.Entropy.Attributes;
 
 namespace Entropy.Scripts.Patches;
 
@@ -13,7 +16,8 @@ namespace Entropy.Scripts.Patches;
 /// A patch to allow writing to the mode logic.
 /// </summary>
 [HarmonyPatch(typeof(AdvancedTablet), nameof(AdvancedTablet.CanLogicWrite))]
-[HarmonyPatchCategory(PatchCategory.AdvancedTabletWriteableMode)]
+[HarmonyPatchCategory("AdvancedTabletWriteableMode")]
+[PatchCategoryDefinition("AdvancedTabletWriteableMode", "Advanced Tablet writeable Mode", "Enables writing Mode logic value into Advanced Tablet to switch between cartridges.")]
 public class AdvancedTabletCanLogicWritePatch
 {
 	[UsedImplicitly]

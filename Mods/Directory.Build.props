@@ -1,0 +1,11 @@
+<Project>
+	<PropertyGroup>
+		<RootNamespace>Entropy.Mods.$(MSBuildProjectName)</RootNamespace>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+		<GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+	</PropertyGroup>
+	<Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+</Project>

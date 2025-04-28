@@ -1,14 +1,17 @@
-﻿using HarmonyLib;
+﻿using Entropy.Attributes;
+using Entropy.Helpers;
+using HarmonyLib;
 using System.Reflection;
 using AccessTools = HarmonyLib.AccessTools;
 
-namespace Entropy.Scripts;
+namespace Entropy.Patches;
 
 /// <summary>
 /// Represents a patch for a method.
 /// </summary>
 public class HarmonyPatchInfo
 {
+	private readonly Action? _unpatch;
 	/// <summary>
 	/// The category of the patch.
 	/// </summary>
@@ -22,7 +25,15 @@ public class HarmonyPatchInfo
 	/// </summary>
 	public Type DeclaringType { get; }
 
+	/// <summary>
+	/// Flag indicating if the patch is currently applied.
+	/// </summary>
 	public bool IsPatched { get; private set; }
+
+	/// <summary>
+	/// Flag indicating if the patch supports reversal.
+	/// </summary>
+	public bool Unpatchable { get; private set; }
 
 	/// <summary>
 	/// Creates a new instance of <see cref="HarmonyPatchInfo"/> from the specified type that defines the patch.
@@ -50,6 +61,11 @@ public class HarmonyPatchInfo
 		var method = HarmonyMethod.Merge(methods);
 		Category = declaringType.GetCategory();
 		OriginalMethod = GetOriginalMethod(declaringType, method);
+		Unpatchable = declaringType.GetCustomAttribute<Unpatchable>() != null;
+		var unpatchMethodInfo = AccessTools.Method(declaringType, "Unpatch");
+		Unpatchable |= unpatchMethodInfo != null;
+		if(unpatchMethodInfo != null)
+			this._unpatch = AccessTools.MethodDelegate<Action>(unpatchMethodInfo);
 		if (OriginalMethod == null)
 			throw new ApplicationException("OriginalMethod is null!");
 	}
@@ -89,6 +105,15 @@ public class HarmonyPatchInfo
 			throw new ArgumentNullException(nameof(harmony));
 		var patched = Harmony.GetPatchInfo(OriginalMethod)?.Owners?.Any(harmony.Id.Equals) ?? false;
 		harmony.Unpatch(OriginalMethod, HarmonyPatchType.All);
+		try
+		{
+			if(this._unpatch is not null)
+				this._unpatch();
+		}
+		catch(Exception e)
+		{
+			EntropyPlugin.LogError($"Error during unpatching: {e}");
+		}
 		IsPatched = false;
 		return patched;
 	}

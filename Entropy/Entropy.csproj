@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<VersionPrefix>1.0.0</VersionPrefix>
+		<Authors>Aberro</Authors>
+		<Copyright>Copyright © 2025 Aberro</Copyright>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/Aberro/Entropy</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+	</PropertyGroup>
+	<ItemGroup Condition="'$(StationeersPath)' != '' and Exists('$(StationeersPath)BepInEx\core\BepInEx.dll')">
+		<Reference Include="Antlr4.Runtime.Standard">
+			<HintPath>..\Exports\GameData\Antlr4.Runtime.Standard.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="ConfigurationManager">
+			<HintPath>..\Exports\GameData\ConfigurationManager.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
+
+	<Target Name="SwitchToDebug" BeforeTargets="Build" Condition="Exists('$(UnityPath)Unity.exe')">
+		<Copy SourceFiles="$(UnityPath)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\WindowsPlayer.exe" DestinationFiles="$(StationeersPath)rocketstation.exe" SkipUnchangedFiles="false" />
+		<Copy SourceFiles="$(UnityPath)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\UnityPlayer.dll" DestinationFiles="$(StationeersPath)UnityPlayer.dll" SkipUnchangedFiles="false" />
+		<Copy SourceFiles="$(UnityPath)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\WinPixEventRuntime.dll" DestinationFiles="$(StationeersPath)WinPixEventRuntime.dll" SkipUnchangedFiles="false" />
+	</Target>
+
+	<Target Name="ExportPlugin" AfterTargets="AssembleFiles" Condition="'$(InstallMods)' == 'true'">
+		<Message Text="Copying the plugin to BepInEx directory..." Importance="High" />
+		<Copy SourceFiles="@(ModFiles)" DestinationFiles="@(ModFiles->'$(StationeersPath)BepInEx\plugins\Entropy\%(RecursiveDir)%(Filename)%(Extension)')" />
+	</Target>
+</Project>

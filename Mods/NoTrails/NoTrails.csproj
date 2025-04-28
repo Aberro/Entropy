@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<VersionPrefix>1.0.0</VersionPrefix>
+		<Authors>Aberro</Authors>
+		<Copyright>Copyright © 2025 Aberro</Copyright>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/Aberro/Entropy</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Entropy\Entropy.csproj">
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</ProjectReference>
+	</ItemGroup>
+</Project>

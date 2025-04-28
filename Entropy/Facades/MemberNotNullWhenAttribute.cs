@@ -1,5 +1,10 @@
-﻿namespace System.Diagnostics.CodeAnalysis;
+﻿#pragma warning disable IDE0130 // Namespace does not match folder structure
+namespace System.Diagnostics.CodeAnalysis;
+#pragma warning restore IDE0130 // Namespace does not match folder structure
 
+/// <summary>
+/// Indicates that a member of a class or struct is not null when the method or property returns a specified value.
+/// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
 public sealed class MemberNotNullWhenAttribute : Attribute
 {

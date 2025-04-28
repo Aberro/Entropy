@@ -1,16 +1,26 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project>
+	<!-- This file is used to set up the project properties and references for all projects. -->
+	<!-- It checks validity of local.props solution file, adds all game dll references, adds Export folder into target folder, sets target folder, etc. -->
 	<PropertyGroup>
 		<TargetFramework>net472</TargetFramework>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<BaseIntermediateOutputPath>$(SolutionDir)\obj\</BaseIntermediateOutputPath>
+		<IntermediateOutputPath>$(SolutionDir)\obj\$(MSBuildProjectName)\</IntermediateOutputPath>
+		<OutputPath>$(SolutionDir)bin\$(MSBuildProjectName)\</OutputPath>
+		<LangVersion>latest</LangVersion>
+		<DebugType>embedded</DebugType>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<Configurations>Debug;Release</Configurations>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<LangVersion>latest</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 	<ItemGroup>
 		<Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
 	</ItemGroup>
 	<ItemGroup>
 		<!-- Unconditional include, to see the file in project even when local.props doesn't exists -->
-		<None Include="README.md" />
+		<None Include="..\README.md" />
 	</ItemGroup>
 	<Import Project="local.props" Condition="Exists('local.props')" />
 	<Choose>
@@ -147,39 +157,23 @@
 			<SpecificVersion>False</SpecificVersion>
 			<Private>False</Private>
 		</Reference>
-
-		<Reference Include="Antlr4.Runtime.Standard">
-			<HintPath>Exports\GameData\Antlr4.Runtime.Standard.dll</HintPath>
+		<Reference Include="Facepunch.Steamworks.Win64">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\Facepunch.Steamworks.Win64.dll</HintPath>
 			<SpecificVersion>False</SpecificVersion>
 			<Private>False</Private>
 		</Reference>
-		<Reference Include="ConfigurationManager">
-			<HintPath>Exports\GameData\ConfigurationManager.dll</HintPath>
+		<Reference Include="Newtonsoft.Json">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\Newtonsoft.Json.dll</HintPath>
 			<SpecificVersion>False</SpecificVersion>
 			<Private>False</Private>
 		</Reference>
 	</ItemGroup>
-
 	<ItemGroup>
 		<ExportsToCopy Include="Exports\**\*" />
 		<ModFiles Include="$(OutputPath)\**\*" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Scripts\Cartridges\" />
-	</ItemGroup>
-
-	<Target Name="SwitchToDebug" BeforeTargets="Build" Condition="Exists('$(UnityPath)Unity.exe')">
-		<Copy SourceFiles="$(UnityPath)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\WindowsPlayer.exe" DestinationFiles="$(StationeersPath)rocketstation.exe" SkipUnchangedFiles="false" />
-		<Copy SourceFiles="$(UnityPath)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\UnityPlayer.dll" DestinationFiles="$(StationeersPath)UnityPlayer.dll" SkipUnchangedFiles="false" />
-		<Copy SourceFiles="$(UnityPath)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\WinPixEventRuntime.dll" DestinationFiles="$(StationeersPath)WinPixEventRuntime.dll" SkipUnchangedFiles="false" />
-	</Target>
 	<Target Name="AssembleFiles" AfterTargets="Build">
-		<Message Text="Copying the files to output directory..." Importance="High" />
+		<Message Text="Copying exports files to output directory..." Importance="High" />
 		<Copy SourceFiles="@(ExportsToCopy)" DestinationFiles="@(ExportsToCopy->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
-	</Target>
-	<Target Name="ExportMod" AfterTargets="AssembleFiles" Condition="'$(InstallMods)' == 'true'">
-		<Message Text="Copying the files to Stationeers mod directory..." Importance="High" />
-		<Copy SourceFiles="@(ModFiles)" DestinationFiles="@(ModFiles->'$(StationeersPath)\BepInEx\plugins\Entropy\%(RecursiveDir)%(Filename)%(Extension)')" />
 	</Target>
 </Project>
