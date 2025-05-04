@@ -61,9 +61,9 @@ public class HarmonyPatchInfo
 		var method = HarmonyMethod.Merge(methods);
 		Category = declaringType.GetCategory();
 		OriginalMethod = GetOriginalMethod(declaringType, method);
-		Unpatchable = declaringType.GetCustomAttribute<Unpatchable>() != null;
+		Unpatchable = declaringType.GetCustomAttribute<Unpatchable>() == null;
 		var unpatchMethodInfo = AccessTools.Method(declaringType, "Unpatch");
-		Unpatchable |= unpatchMethodInfo != null;
+		Unpatchable = Unpatchable && unpatchMethodInfo == null;
 		if(unpatchMethodInfo != null)
 			this._unpatch = AccessTools.MethodDelegate<Action>(unpatchMethodInfo);
 		if (OriginalMethod == null)
@@ -97,25 +97,30 @@ public class HarmonyPatchInfo
 	/// Revert the patch using specified <see cref="Harmony"/> instance.
 	/// </summary>
 	/// <param name="harmony">Harmony instance to use for unpatching.</param>
-	/// <returns></returns>
+	/// <returns><see langword="true"/> if unpatching was successful, otherwise <see langword="false"/>.</returns>
 	/// <exception cref="ArgumentNullException">Thrown when <paramref name="harmony"/> is null.</exception>
 	public bool Unpatch(Harmony harmony)
 	{
 		if (harmony == null)
 			throw new ArgumentNullException(nameof(harmony));
-		var patched = Harmony.GetPatchInfo(OriginalMethod)?.Owners?.Any(harmony.Id.Equals) ?? false;
-		harmony.Unpatch(OriginalMethod, HarmonyPatchType.All);
+		if(!IsPatched || Unpatchable)
+			return false;
 		try
 		{
+			// Check if the method is actually patched (though it might be not by this patch).
+			if(Harmony.GetPatchInfo(OriginalMethod)?.Owners?.Any(harmony.Id.Equals) ?? false)
+				harmony.CreateProcessor(OriginalMethod).Unpatch(HarmonyPatchType.All, harmony.Id);
 			if(this._unpatch is not null)
 				this._unpatch();
+			IsPatched = false;
+			return true;
 		}
 		catch(Exception e)
 		{
 			EntropyPlugin.LogError($"Error during unpatching: {e}");
+			Unpatchable = true;
+			return false;
 		}
-		IsPatched = false;
-		return patched;
 	}
 
 	private static MethodBase GetOriginalMethod(Type declaringType, HarmonyMethod attr)

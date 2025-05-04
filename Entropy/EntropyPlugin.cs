@@ -1,9 +1,9 @@
 using BepInEx;
 using UnityEngine;
 using System.Reflection;
-using JetBrains.Annotations;
 using Entropy.Patches;
 using Entropy.Mods;
+using HarmonyLib;
 
 namespace Entropy;
 
@@ -14,6 +14,13 @@ namespace Entropy;
 [BepInProcess("rocketstation.exe")]
 public class EntropyPlugin : BaseUnityPlugin
 {
+	[HarmonyPatch(typeof(WorkshopMenu), nameof(WorkshopMenu.LoadModConfig))]
+	private static class BootstrapPatch
+	{
+		public static void Postfix() =>
+			// Initialize the mods collector
+			ModsCollector.Init();
+	}
 	/// <summary>
 	/// The ID of the plugin.
 	/// </summary>
@@ -32,19 +39,35 @@ public class EntropyPlugin : BaseUnityPlugin
 	/// </summary>
 	public new static Config Config { get; private set; } = null!;
 
+	/// <summary>
+	/// The instance of the plugin.
+	/// </summary>
+	internal static EntropyPlugin Instance { get; private set; } = null!;
+
+	/// <summary>
+	/// Static constructor for the <see cref="EntropyPlugin"/> class, performs preliminary initialization.
+	/// </summary>
+	/// <remarks>
+	/// The plugin uses some of the game's initialization and hence cannot be initialized before the game is partially loaded.
+	/// For proper initialization to start, it uses a <see cref="BootstrapPatch"/> to hook into <see cref="WorkshopMenu.LoadModConfig" /> method,
+	/// which will initialize <see cref="ModsCollector"/> and apply all remaining Entropy framework patches.
+	/// </remarks>
 	static EntropyPlugin()
 	{
+		// We can't fully initialize the plugin before the game is partially loaded, so we'll use this BootstrapPatch to hook to <See
+		var harmony = new Harmony("Entropy bootstrapper");
+		harmony.CreateClassProcessor(typeof(BootstrapPatch)).Patch();
 	}
+
+	[HarmonyPatch(typeof(WorkshopMenu), nameof(WorkshopMenu.LoadModConfig))]
+	private static void Postfix() =>
+		// Initialize the mods collector
+		ModsCollector.Init();
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="EntropyPlugin"/> class.
 	/// </summary>
-	public EntropyPlugin()
-	{
-		var mainMod = new EntropyModData();
-		ModsCollector.AddMod(mainMod, Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase));
-		Config = mainMod.Config;
-	}
+	public EntropyPlugin() => Instance = this;
 
 	/// <summary>
 	/// Log a message to the Unity debug log.
@@ -65,43 +88,18 @@ public class EntropyPlugin : BaseUnityPlugin
 	public static void LogError(string line) =>
 		Debug.LogError("[" + PluginName + "]: " + line);
 
-	[UsedImplicitly]
-	void Awake()
-	{
-		Log("Initializing...");
-		// Replace BepInEx's config instance with out instance.
-		var backingField = typeof(BaseUnityPlugin).GetFields(BindingFlags.Instance | BindingFlags.NonPublic).First(x => x.Name.Contains(nameof(BaseUnityPlugin.Config)))
-			?? throw new Exception("Could not find backing field for Config property");
-		backingField.SetValue(this, Config);
-	}
-
 	/// <summary>
-	/// Called when the plugin is loaded.
+	/// Swaps the config instance for this plugin with our instance.
 	/// </summary>
-	public void OnEnable()
+	/// <exception cref="Exception"></exception>
+	internal void SwapConfig()
 	{
-		try
-		{
-			Log("Patching done.");
-		}
-		catch(Exception e)
-		{
-			LogError("Patching failed:");
-			LogError(e.ToString());
-		}
-	}
-
-	private void OnDisable()
-	{
-		try
-		{
-			PatchesCollector.DisableAll();
-		}
-		catch(Exception e)
-		{
-			LogError("Unpatching failed:");
-			LogError(e.ToString());
-		}
+		Config = ModsCollector.GetByAssembly(Assembly.GetExecutingAssembly())!.Config;
+		// Replace BepInEx's config instance with out instance.
+		var backingField = typeof(BaseUnityPlugin).GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+			                   .First(x => x.Name.Contains(nameof(BaseUnityPlugin.Config)))
+		                   ?? throw new Exception("Could not find backing field for Config property");
+		backingField.SetValue(this, Config);
 	}
 
 	/// <summary>

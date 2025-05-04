@@ -28,6 +28,7 @@
 
 	<Target Name="ExportPlugin" AfterTargets="AssembleFiles" Condition="'$(InstallMods)' == 'true'">
 		<Message Text="Copying the plugin to BepInEx directory..." Importance="High" />
+		<Sleep Milliseconds="500" />
 		<Copy SourceFiles="@(ModFiles)" DestinationFiles="@(ModFiles->'$(StationeersPath)BepInEx\plugins\Entropy\%(RecursiveDir)%(Filename)%(Extension)')" />
 	</Target>
 </Project>

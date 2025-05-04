@@ -57,6 +57,11 @@
 			<SpecificVersion>False</SpecificVersion>
 			<Private>False</Private>
 		</Reference>
+		<Reference Include="Mono.Cecil">
+			<HintPath>$(StationeersPath)BepInEx\core\Mono.Cecil.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
 		<Reference Include="UnityEngine">
 			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.dll</HintPath>
 			<SpecificVersion>False</SpecificVersion>
@@ -167,6 +172,11 @@
 			<SpecificVersion>False</SpecificVersion>
 			<Private>False</Private>
 		</Reference>
+		
+		<PackageReference Include="MSBuildTasks" Version="1.5.0.235">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 	<ItemGroup>
 		<ExportsToCopy Include="Exports\**\*" />
@@ -174,6 +184,7 @@
 	</ItemGroup>
 	<Target Name="AssembleFiles" AfterTargets="Build">
 		<Message Text="Copying exports files to output directory..." Importance="High" />
+		<Sleep Milliseconds="500" />
 		<Copy SourceFiles="@(ExportsToCopy)" DestinationFiles="@(ExportsToCopy->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
 	</Target>
 </Project>

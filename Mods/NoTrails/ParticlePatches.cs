@@ -1,7 +1,9 @@
 ﻿using HarmonyLib;
 using Assets.Scripts;
 using System.Reflection;
+using Entropy.Attributes;
 
+[assembly: EntropyMod]
 [assembly: AssemblyTitle("No Particle Trails")]
 [assembly: AssemblyDescription("Disables gas particle trails.")]
 
