@@ -19,7 +19,7 @@ public static class NoTrailsPatch
 	/// <summary>
 	/// Disables particle trails if AtmosphericsController is already initialized.
 	/// </summary>
-	public static void Prepare()
+	private static void Prepare()
 	{
 		if(AtmosphericsController.World != null)
 		{
@@ -31,7 +31,7 @@ public static class NoTrailsPatch
 	/// Patches AtmosphericsController constructor to disable particle trails.
 	/// </summary>
 	/// <param name="__instance"></param>
-	public static void Postfix(AtmosphericsController __instance)
+	private static void Postfix(AtmosphericsController __instance)
 	{
 		var trails = __instance.GasVisualizerParticleSystem.trails;
 		trails.enabled = false;
@@ -41,7 +41,7 @@ public static class NoTrailsPatch
 	/// <summary>
 	/// Unpatches AtmosphericsController constructor to re-enable particle trails.
 	/// </summary>
-	public static void Unpatch()
+	private static void Unpatch()
 	{
 		if(AtmosphericsController.World != null)
 		{

@@ -1,4 +1,6 @@
-﻿using ImGuiNET;
+﻿using Assets.Scripts.UI.ImGuiUi;
+using Entropy.UI.ImGUI;
+using ImGuiNET;
 using UnityEngine;
 
 namespace Entropy.UI;
@@ -671,6 +673,27 @@ public static class ImGuiHelper
 			ImGui.EndTabBar();
 		}
 		return result;
+	}
+
+	public static unsafe bool VerticalTabBar(string str_id, Action body)
+	{
+
+		var g = (ImGuiContext*)ImGui.GetCurrentContext();
+		return false;
+		var window = ImGui.GetCurrentWindow();
+		if(window.SkipItems)
+			return false;
+		//var g = (ImGuiContext*)ImGui.GetCurrentContext();
+		//var id = window.GetID(str_id);
+		//ref var tab_bar = ref g->TabBars.GetOrAddByKey(id);
+		//Rect tab_bar_bb = Rect.MinMaxRect(window.DC.CursorPos.x, window.DC.CursorPos.y, window.WorkRect.xMax,
+		//	window.DC.CursorPos.y + g->FontSize + g->Style.FramePadding.y * 2);
+		//tab_bar.ID = id;
+		//tab_bar.SeparatorMinX = tab_bar->BarRect.Min.x - IM_TRUNC(window->WindowPadding.x * 0.5f);
+		//tab_bar.SeparatorMaxX = tab_bar->BarRect.Max.x + IM_TRUNC(window->WindowPadding.x * 0.5f);
+		////if (g.NavWindow && IsWindowChildOf(g.NavWindow, window, false, false))
+		//flags |= ImGuiTabBarFlags_IsFocused;
+		//return BeginTabBarEx(tab_bar, tab_bar_bb, flags);
 	}
 
 	/// <summary>

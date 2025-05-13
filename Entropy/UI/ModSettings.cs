@@ -8,6 +8,11 @@ using BepInEx.Configuration;
 using Entropy.Helpers;
 using Entropy.Patches;
 using UnityEngine.Events;
+using Assets.Scripts.UI.ImGuiUi;
+using Entropy.UI.ImGUI;
+using System.Runtime.InteropServices;
+using System.Text;
+using Unity.Collections.LowLevel.Unsafe;
 
 namespace Entropy.UI;
 
@@ -68,22 +73,22 @@ public class ModSettings : MonoBehaviour
 
 	private void ToggleModSettings(bool arg) => _modSettingsDisplayed = arg;
 
-	void OnLayout()
+	private void OnLayout()
 	{
 		ImGui.SetNextWindowPos(new Vector2(0, 0), ImGuiCond.Always);
 		ImGui.SetNextWindowSize(new Vector2(Screen.width, Screen.height), ImGuiCond.Always);
 
 		ImGui.Begin("::Overlay",
 		ImGuiWindowFlags.NoTitleBar
-		| ImGuiWindowFlags.NoResize
-		| ImGuiWindowFlags.NoMove
-		| ImGuiWindowFlags.NoScrollbar
-		| ImGuiWindowFlags.NoBackground
-		| ImGuiWindowFlags.NoCollapse
-		| ImGuiWindowFlags.NoDecoration
-		| ImGuiWindowFlags.NoSavedSettings
-		| ImGuiWindowFlags.NoNavFocus
-		| ImGuiWindowFlags.NoBringToFrontOnFocus);
+			| ImGuiWindowFlags.NoResize
+			| ImGuiWindowFlags.NoMove
+			| ImGuiWindowFlags.NoScrollbar
+			| ImGuiWindowFlags.NoBackground
+			| ImGuiWindowFlags.NoCollapse
+			| ImGuiWindowFlags.NoDecoration
+			| ImGuiWindowFlags.NoSavedSettings
+			| ImGuiWindowFlags.NoNavFocus
+			| ImGuiWindowFlags.NoBringToFrontOnFocus);
 		if(!this._patchedUI)
 		{
 			// If patching the game's UI wasn't successfull for some reason, display top left corner buttons.
@@ -121,22 +126,7 @@ public class ModSettings : MonoBehaviour
 			if(window.WasActive)
 				ImGuiHost.PushWindowRect(new Rect(window.Pos, window.ContentSize));
 		}
-		if(_modSettingsDisplayed)
-			_modSettingsDisplayed = ImGuiHelper.Window("Mod Settings", ImGuiWindowFlags.AlwaysAutoResize, () =>
-				ImGuiHelper.TabBar("ModsTabBar", () => 
-					PatchCategory.ModPatchCategories.Keys.ForEach(mod => ImGuiHelper.TabItem(mod.Name, () =>
-						mod.Categories.ForEach(category =>
-						{
-							if(ImGui.CollapsingHeader(category.Name))
-							{
-								var enabled = category.Enabled;
-								ImGui.Checkbox("Enabled", ref enabled);
-								category.Enabled = enabled;
-							}
-						})
-					))
-				)
-			);
+		ModSettingsWindow();
 		//foreach(PatchCategory category in Enum.GetValues(typeof(PatchCategory)))
 		//{
 		//	if(category == PatchCategory.None)
@@ -230,6 +220,54 @@ public class ModSettings : MonoBehaviour
 		//	}
 		//}
 	}
+
+	private byte[] debugBuffer;
+	private string testStr = "";
+	private unsafe void ModSettingsWindow()
+	{
+		if(!_modSettingsDisplayed)
+			return;
+
+		var windowName = "Mod Settings";
+		ImGui.SetWindowSize(windowName, new Vector2(400, 600), ImGuiCond.Appearing);
+		_modSettingsDisplayed = ImGuiHelper.Window(windowName, ImGuiWindowFlags.AlwaysAutoResize, () =>
+		{
+
+			//Debug.LogWarning("Before:");
+			//Debug.LogWarning(ByteHelper.CopyPtrToBuffer<ImGuiContext>(ref this.debugBuffer, g).ToHexString());
+			ImGuiHelper.TabBar("ModsTabBar", () =>
+			{
+				//Debug.LogWarning("Inside:");
+				//Debug.LogWarning(ByteHelper.CopyPtrToBuffer<ImGuiContext>(ref this.debugBuffer, g).ToHexString());
+				PatchCategory.ModPatchCategories.Keys.ForEach(mod => ImGuiHelper.TabItem(mod.Name, () =>
+				{
+					mod.Categories.ForEach(category =>
+					{
+						if(ImGui.CollapsingHeader(category.Name))
+						{
+							var enabled = category.Enabled;
+							ImGui.Checkbox("Enabled", ref enabled);
+							if(ImGui.InputText("Test", ref testStr, 1000, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.CharsUppercase))
+							{
+								// 0x00018424
+								var g = (ImGuiContext*)ImGui.GetCurrentContext();
+								Debug.LogWarning(ByteHelper.CopyPtrToBuffer<ImGuiContext>(ref this.debugBuffer, g).ToHexString());
+							}
+							category.Enabled = enabled;
+						}
+					});
+				}));
+			});
+			//Debug.LogWarning("After:");
+			//Debug.LogWarning(ByteHelper.CopyPtrToBuffer<ImGuiContext>(ref this.debugBuffer, g).ToHexString());
+		});
+	}
+
+	private static ReadOnlySpan<byte> HexAlphabetSpan => new[]
+	{
+		(byte)'0', (byte)'1', (byte)'2', (byte)'3', (byte)'4', (byte)'5', (byte)'6', (byte)'7', (byte)'8',
+		(byte)'9', (byte)'A', (byte)'B', (byte)'C', (byte)'D', (byte)'E', (byte)'F'
+	};
 
 	/// <summary>
 	/// Displays the mod settings UI.

@@ -101,8 +101,8 @@ public class EntropyMod
 		var about = modData.GetAboutData();
 		if(about is null || !about.IsValid)
 		{
-			var selfTraverse = Traverse.Create(this);
-			about = new ModAbout()
+			var selfTraverse = Traverse.Create(modData);
+			about = new ModAbout
 			{
 				Author = assembly.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(x => x.Key == "Authors")?.Value
 					?? assembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? "Stationeers modding community",

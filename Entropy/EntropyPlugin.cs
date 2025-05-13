@@ -4,6 +4,7 @@ using System.Reflection;
 using Entropy.Patches;
 using Entropy.Mods;
 using HarmonyLib;
+using ImGuiNET;
 
 namespace Entropy;
 

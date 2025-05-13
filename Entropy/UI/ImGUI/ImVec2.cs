@@ -1,0 +1,14 @@
+﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+using UnityEngine;
+
+namespace Entropy.UI.ImGUI;
+
+public struct ImVec2(float x, float y)
+{
+	public float X = x;
+	public float Y = y;
+
+	public static implicit operator Vector2(ImVec2 v) => new Vector2(v.X, v.Y);
+	public static implicit operator ImVec2(Vector2 v) => new ImVec2(v.x, v.y);
+}
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
