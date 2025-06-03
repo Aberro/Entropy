@@ -1,11 +1,196 @@
 <Project>
+	<!-- This file is used to set up the project properties and references for all projects. -->
+	<!-- It checks validity of local.props solution file, adds all game dll references, adds Export folder into target folder, sets target folder, etc. -->
 	<PropertyGroup>
 		<RootNamespace>Entropy.Mods.$(MSBuildProjectName)</RootNamespace>
+		<TargetFramework>net472</TargetFramework>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<BaseIntermediateOutputPath>$(SolutionDir)\obj\</BaseIntermediateOutputPath>
+		<IntermediateOutputPath>$(SolutionDir)\obj\$(MSBuildProjectName)\</IntermediateOutputPath>
+		<OutputPath>$(SolutionDir)bin\$(MSBuildProjectName)\</OutputPath>
+		<LangVersion>latest</LangVersion>
+		<DebugType>embedded</DebugType>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<Configurations>Debug;Release</Configurations>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
 		<GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
 		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
 		<GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
 	</PropertyGroup>
-	<Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+	<ItemGroup>
+		<Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
+	</ItemGroup>
+	<ItemGroup>
+		<!-- Unconditional include, to see the file in project even when local.props doesn't exists -->
+		<None Include="..\README.md" />
+	</ItemGroup>
+	<Import Project="local.props" Condition="Exists('local.props')" />
+	<Choose>
+		<When Condition="'$(StationeersPath)' == '' or !Exists('$(StationeersPath)BepInEx\core\BepInEx.dll')">
+			<ItemGroup>
+				<None Remove="**\*" />
+				<Compile Remove="**\*" />
+				<Content Remove="**\*" />
+			</ItemGroup>
+			<ItemGroup Condition="'$(StationeersPath)' == ''">
+				<!-- Check for local.props -->
+				<None Include="ERROR local.props file not found. Read README.md" />
+			</ItemGroup>
+			<ItemGroup Condition="'$(StationeersPath)' != '' and !Exists('$(StationeersPath)BepInEx\core\BepInEx.dll')">
+				<!-- Check if the game is modded (required for proper references)-->
+				<None Include="ERROR Your Stationeers isn't modded. Please, install BepInEx into the game before loading this project." />
+			</ItemGroup>
+			<ItemGroup Condition="'$(UnityPath)' != '' and !Exists('$(UnityPath)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\WindowsPlayer.exe')">
+				<!-- Check for local.props -->
+				<None Include="ERROR UnityPath in local.props has incorrect value, can't find Unity files." />
+			</ItemGroup>
+		</When>
+		<Otherwise>
+		</Otherwise>
+	</Choose>
+	<ItemGroup Condition="'$(StationeersPath)' != '' and Exists('$(StationeersPath)BepInEx\core\BepInEx.dll')">
+		<Reference Include="BepInEx">
+			<HintPath>$(StationeersPath)BepInEx\core\BepInEx.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="0Harmony">
+			<HintPath>$(StationeersPath)BepInEx\core\0Harmony.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Mono.Cecil">
+			<HintPath>$(StationeersPath)BepInEx\core\Mono.Cecil.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Assembly-CSharp">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\Assembly-CSharp.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Assembly-CSharp-firstpass">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UniTask">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UniTask.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Unity.TextMeshPro">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.IMGUIModule">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.ImageConversionModule">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.UIModule">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.UIElementsModule">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.UIElementsModule.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.UI">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.UI.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.PhysicsModule">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.TextRenderingModule">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.AssetBundleModule">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.InputLegacyModule">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="RG.ImGui">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\RG.ImGui.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="RG.ImGui.Unity">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\RG.ImGui.Unity.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.AnimationModule">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="mscorlib">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\mscorlib.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.ParticleSystemModule">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Facepunch.Steamworks.Win64">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\Facepunch.Steamworks.Win64.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Newtonsoft.Json">
+			<HintPath>$(StationeersPath)\rocketstation_Data\Managed\Newtonsoft.Json.dll</HintPath>
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</Reference>
+
+		<PackageReference Include="MSBuildTasks" Version="1.5.0.235">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+		<ExportsToCopy Include="Exports\**\*" />
+		<ModFiles Include="$(OutputPath)\**\*" />
+	</ItemGroup>
+	<Target Name="AssembleFiles" AfterTargets="Build">
+		<Message Text="Copying exports files to output directory..." Importance="High" />
+		<Sleep Milliseconds="500" />
+		<Copy SourceFiles="@(ExportsToCopy)" DestinationFiles="@(ExportsToCopy->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+	</Target>
 </Project>

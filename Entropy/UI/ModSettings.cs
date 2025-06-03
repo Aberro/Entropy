@@ -13,6 +13,7 @@ using Entropy.UI.ImGUI;
 using System.Runtime.InteropServices;
 using System.Text;
 using Unity.Collections.LowLevel.Unsafe;
+using ImGuiWindowFlags = Entropy.UI.ImGUI.ImGuiWindowFlags;
 
 namespace Entropy.UI;
 
@@ -79,7 +80,8 @@ public class ModSettings : MonoBehaviour
 		ImGui.SetNextWindowSize(new Vector2(Screen.width, Screen.height), ImGuiCond.Always);
 
 		ImGui.Begin("::Overlay",
-		ImGuiWindowFlags.NoTitleBar
+			(ImGuiNET.ImGuiWindowFlags)
+			(ImGuiWindowFlags.NoTitleBar
 			| ImGuiWindowFlags.NoResize
 			| ImGuiWindowFlags.NoMove
 			| ImGuiWindowFlags.NoScrollbar
@@ -88,7 +90,7 @@ public class ModSettings : MonoBehaviour
 			| ImGuiWindowFlags.NoDecoration
 			| ImGuiWindowFlags.NoSavedSettings
 			| ImGuiWindowFlags.NoNavFocus
-			| ImGuiWindowFlags.NoBringToFrontOnFocus);
+			| ImGuiWindowFlags.NoBringToFrontOnFocus));
 		if(!this._patchedUI)
 		{
 			// If patching the game's UI wasn't successfull for some reason, display top left corner buttons.
@@ -235,7 +237,7 @@ public class ModSettings : MonoBehaviour
 
 			//Debug.LogWarning("Before:");
 			//Debug.LogWarning(ByteHelper.CopyPtrToBuffer<ImGuiContext>(ref this.debugBuffer, g).ToHexString());
-			ImGuiHelper.TabBar("ModsTabBar", () =>
+			ImGuiHelper.VerticalTabBar("ModsTabBar", ImGUI.ImGuiTabBarFlags.None, () =>
 			{
 				//Debug.LogWarning("Inside:");
 				//Debug.LogWarning(ByteHelper.CopyPtrToBuffer<ImGuiContext>(ref this.debugBuffer, g).ToHexString());

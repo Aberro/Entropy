@@ -15,21 +15,24 @@ public unsafe struct ImPool<T> where T : unmanaged
 	public T* GetByKey(ImGuiID key)
 	{
 		var idx = this._map.GetInt(key, -1);
-		return idx != -1 ? this._buf[idx] : null;
+		return idx != -1 ? this._buf.GetPtr(idx) : null;
 	}
-	public readonly T* GetByIndex(ImPoolIdx n) => this._buf[n];
-	private readonly ImPoolIdx GetIndex(T* p) => this._buf.IndexOf(p);
+	public readonly T* GetByIndex(ImPoolIdx n) => this._buf.GetPtr(n);
+	public readonly ImPoolIdx GetIndex(T* p) => this._buf.IndexOf(p);
 
 	public T* GetOrAddByKey(ImGuiID key)
 	{
 		var pIdx = this._map.GetIntRef(key, -1);
 		var idx = *pIdx;
 		if(idx != -1)
-			return this._buf[idx];
+			return this._buf.GetPtr(idx);
 		*pIdx = this._freeIdx;
 		return Add();
 	}
-
+	public bool Contains(T* p)
+	{
+		return this._buf.Contains(p);
+	}
 	public bool ContainsKey(ImGuiID key)
 	{
 		var idx = this._map.GetInt(key, -1);
@@ -51,16 +54,16 @@ public unsafe struct ImPool<T> where T : unmanaged
 		}
 		else
 			// This is some C++ bullshit, I have no fucking clue what it does and just hope I rewrote it correctly in C#...
-			this._freeIdx = *(int*)this._buf[idx];
+			this._freeIdx = *(int*)this._buf.GetPtr(idx);
 
-		*this._buf[idx] = new T();
+		*this._buf.GetPtr(idx) = new T();
 		this._aliveCount++;
-		return this._buf[idx];
+		return this._buf.GetPtr(idx);
 	}
 	public void Remove(ImGuiID key, T* p) => Remove(key, GetIndex(p));
 	public void Remove(ImGuiID key, ImPoolIdx idx)
 	{ 
-		*(int*)this._buf[idx] = this._freeIdx;
+		*(int*)this._buf.GetPtr(idx) = this._freeIdx;
 		this._freeIdx = idx;
 		this._map.SetInt(key, -1);
 		this._aliveCount--;
@@ -78,7 +81,7 @@ public unsafe struct ImPool<T> where T : unmanaged
 	public readonly int GetMapSize() => this._map.Data.Size;
 	public readonly T* TryGetMapData(ImPoolIdx n)
 	{
-		var idx = this._map.Data[n]->val_i;
+		var idx = this._map.Data.GetPtr(n)->val_i;
 		if(idx == -1)
 			return null;
 		return GetByIndex(idx);

@@ -1,6 +1,7 @@
 ﻿
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 using ImGuiNET;
+using ImGuiWindowPtr = Entropy.UI.ImGUI.ImGuiWindowPtr;
 
 namespace Entropy.UI.ImGUI;
 

@@ -1,4 +1,5 @@
 ﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
 using System.Runtime.InteropServices;
 using ImGuiNET;
 using UnityEngine;
@@ -9,27 +10,9 @@ using ImS8 = sbyte;
 using ImGuiKeyChord = int;
 using ImFileHandle = System.IntPtr;
 using ImGuiErrorCallback = System.IntPtr;
+using ImGuiWindowPtr = Entropy.UI.ImGUI.ImGuiWindowPtr;
 
 namespace Entropy.UI.ImGUI;
-
-public struct ImGuiContextPtr
-{
-#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
-	public unsafe ImGuiContext* NativePtr { get; }
-	public unsafe ImGuiContextPtr(ImGuiContext* nativePtr) => NativePtr = nativePtr;
-	public unsafe ImGuiContextPtr(IntPtr nativePtr) => NativePtr = (ImGuiContext*)(void*)nativePtr;
-	public static unsafe implicit operator ImGuiContextPtr(ImGuiContext* nativePtr) => new(nativePtr);
-	public static unsafe implicit operator ImGuiContext*(ImGuiContextPtr wrappedPtr) => wrappedPtr.NativePtr;
-	public static implicit operator ImGuiContextPtr(IntPtr nativePtr) => new(nativePtr);
-#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
-}
-
-public class TestUnmanaged<T> where T : unmanaged { }
-
-public class test
-{
-	TestUnmanaged<ImGuiContext>? asdf;
-}
 
 [StructLayout(LayoutKind.Sequential)]
 public unsafe struct ImGuiContext
@@ -40,7 +23,7 @@ public unsafe struct ImGuiContext
 	public ImVector<ImGuiInputEvent> InputEventsQueue;                 // Input events which will be tricked/written into IO structure.
 	public ImVector<ImGuiInputEvent> InputEventsTrail;                 // Past input events processed in NewFrame(). This is to allow domain-specific application to access e.g mouse/pen trail.
 	public ImGuiStyle Style;
-	public ImFontPtr Font;                               // (Shortcut) == FontStack.empty() ? IO.Font : FontStack.back()
+	public ImFont* Font;                               // (Shortcut) == FontStack.empty() ? IO.Font : FontStack.back()
 	public float FontSize;                           // (Shortcut) == FontBaseSize Ptr g.CurrentWindow->FontWindowScale == window->FontSize(). Text height for current window.
 	public float FontBaseSize;                       // (Shortcut) == IO.FontGlobalScale Ptr Font->Scale Ptr Font->FontSize. Base text height.
 	public ImDrawListSharedData DrawListSharedData;

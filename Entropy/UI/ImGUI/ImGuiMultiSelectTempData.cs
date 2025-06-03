@@ -5,17 +5,7 @@ using ImGuiKeyChord = int;
 using ImS8 = sbyte;
 
 namespace Entropy.UI.ImGUI;
-public struct ImGuiMultiSelectTempDataPtr
-{
-#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
-	public unsafe ImGuiMultiSelectTempData* NativePtr { get; }
-	public unsafe ImGuiMultiSelectTempDataPtr(ImGuiMultiSelectTempData* nativePtr) => NativePtr = nativePtr;
-	public unsafe ImGuiMultiSelectTempDataPtr(IntPtr nativePtr) => NativePtr = (ImGuiMultiSelectTempData*)(void*)nativePtr;
-	public static unsafe implicit operator ImGuiMultiSelectTempDataPtr(ImGuiMultiSelectTempData* nativePtr) => new(nativePtr);
-	public static unsafe implicit operator ImGuiMultiSelectTempData*(ImGuiMultiSelectTempDataPtr wrappedPtr) => wrappedPtr.NativePtr;
-	public static implicit operator ImGuiMultiSelectTempDataPtr(IntPtr nativePtr) => new(nativePtr);
-#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
-}
+
 public struct ImGuiMultiSelectTempData
 {
 	public ImGuiMultiSelectIO IO;                 // MUST BE FIRST FIELD. Requests are set and returned by BeginMultiSelect()/EndMultiSelect() + written to by user during the loop.

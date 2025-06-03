@@ -4,11 +4,11 @@ using ImS8 = sbyte;
 
 public struct ImGuiSelectionRequest
 {
-	ImGuiSelectionRequestType Type;
-	bool Selected;
-	ImS8 RangeDirection;
-	ImGuiSelectionUserData RangeFirstItem;
-	ImGuiSelectionUserData RangeLastItem;
+	public ImGuiSelectionRequestType Type;
+	public bool Selected;
+	public ImS8 RangeDirection;
+	public ImGuiSelectionUserData RangeFirstItem;
+	public ImGuiSelectionUserData RangeLastItem;
 }
 
 public enum ImGuiSelectionRequestType

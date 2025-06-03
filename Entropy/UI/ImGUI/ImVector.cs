@@ -5,6 +5,51 @@ using System.Runtime.CompilerServices;
 using Unity.Collections.LowLevel.Unsafe;
 
 namespace Entropy.UI.ImGUI;
+
+public readonly unsafe struct ImVectorPtr<T>(ImVector<T>* nativePtr) where T : unmanaged
+{
+#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
+	public ImVector<T>* NativePtr { get; } = nativePtr;
+
+	public ImVectorPtr(IntPtr nativePtr) : this((ImVector<T>*)(void*)nativePtr)
+	{
+	}
+
+	public static implicit operator ImVectorPtr<T>(ImVector<T>* nativePtr) => new(nativePtr);
+	public static implicit operator ImVector<T>*(ImVectorPtr<T> wrappedPtr) => wrappedPtr.NativePtr;
+	public static implicit operator ImVectorPtr<T>(IntPtr nativePtr) => new(nativePtr);
+
+	public bool IsEmpty => NativePtr->IsEmpty;
+	public int Size => NativePtr->Size;
+	public int SizeInBytes => NativePtr->SizeInBytes;
+	public static int MaxSize => ImVector<T>.MaxSize;
+
+	public T Get(int i) => NativePtr->Get(i);
+
+	public T GetLast() => NativePtr->Get(NativePtr->Size - 1);
+
+	public T GetFirst() => NativePtr->Get(0);
+	public void Set(int i, T v) => NativePtr->Set(i, v);
+	public T* GetPtr(int i) => NativePtr->GetPtr(i);
+	public void SetPtr(int i, T* v) => NativePtr->SetPtr(i, v);
+	public int Capacity() => NativePtr->Capacity();
+	public ImVector<T>.Enumerator GetEnumerator() => NativePtr->GetEnumerator();
+	public void Clear() => NativePtr->Clear();
+	public void Resize(int newSize) => NativePtr->Resize(newSize);
+	public void Shrink(int newSize) => NativePtr->Shrink(newSize);
+	public void Reserve(int newCapacity) => NativePtr->Reserve(newCapacity);
+	public void ReserveClear(int newCapacity) => NativePtr->ReserveClear(newCapacity);
+	public T* Add(T* v) => NativePtr->Add(v);
+	public void Pop() => NativePtr->Pop();
+	public void Remove(T* item) => NativePtr->Remove(item);
+	public void Remove(T* from, T* to) => NativePtr->Remove(from, to);
+	public void RemoveAt(int index) => NativePtr->RemoveAt(index);
+	public void RemoveWithLastItem(T* item) => NativePtr->RemoveWithLastItem(item);
+	public T* Insert(int index, T* v) => NativePtr->Insert(index, v);
+	public bool Contains(T* v) => NativePtr->Contains(v);
+	public int IndexOf(T* item) => NativePtr->IndexOf(item);
+	public int IndexFromPtr(T* item) => NativePtr->IndexFromPtr(item);
+}
 public unsafe struct ImVector<T> where T : unmanaged
 {
 	public ref struct Enumerator
@@ -32,7 +77,7 @@ public unsafe struct ImVector<T> where T : unmanaged
 		public readonly T* Current
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => this._vector[this._index];
+			get => this._vector.GetPtr(this._index);
 		}
 	}
 	int _size;
@@ -56,16 +101,33 @@ public unsafe struct ImVector<T> where T : unmanaged
 	public readonly int Size => this._size;
 	public readonly int SizeInBytes => this._size * sizeof(T);
 	public static int MaxSize => 0x7FFFFFFF / sizeof(T);
-	public readonly int Capacity() => this._capacity;
-	public readonly T* this[int i]
+	public readonly T Get(int i)
 	{
-		get
-		{
-			if(i < 0 || i >= this._size || this._data == null)
-				throw new ArgumentOutOfRangeException();
-			return this._data + i;
-		}
+		if(i < 0 || i >= this._size || this._data == null)
+			throw new ArgumentOutOfRangeException();
+		return *(this._data + i);
 	}
+	public T GetLast() => Get(Size - 1);
+	public T GetFirst() => Get(0);
+	public void Set(int i, T v)
+	{
+		if(i < 0 || i >= this._size || this._data == null)
+			throw new ArgumentOutOfRangeException();
+		UnsafeUtility.MemCpy(this._data + i, &v, sizeof(T));
+	}
+	public readonly T* GetPtr(int i)
+	{
+		if(i < 0 || i >= this._size || this._data == null)
+			throw new ArgumentOutOfRangeException();
+		return this._data + i;
+	}
+	public void SetPtr(int i, T* v)
+	{
+		if(i < 0 || i >= this._size || this._data == null)
+			throw new ArgumentOutOfRangeException();
+		UnsafeUtility.MemCpy(this._data + i, v, sizeof(T));
+	}
+	public readonly int Capacity() => this._capacity;
 
 	public readonly Enumerator GetEnumerator() => new(this);
 	public void Clear()
@@ -175,12 +237,14 @@ public unsafe struct ImVector<T> where T : unmanaged
 		this._size++;
 		return this._data + index;
 	}
-	public readonly bool Contains(ref T v)
+	public readonly bool Contains(T* v)
 	{
 		var dataStart = this._data;
 		var dataEnd = this._data + this._size;
+		if(v >= dataStart && v < dataEnd)
+			return true;
 		while (dataStart < dataEnd)
-			if ((*dataStart++).Equals(v))
+			if ((*dataStart++).Equals(*v))
 				return true;
 		return false;
 	}

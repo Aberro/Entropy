@@ -1,4 +1,5 @@
-﻿namespace Entropy.UI.ImGUI;
+﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+namespace Entropy.UI.ImGUI;
 
 public unsafe struct ImGuiTextIndex
 {

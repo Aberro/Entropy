@@ -2,6 +2,7 @@
 using ImGuiNET;
 using UnityEngine;
 using ImGuiID = uint;
+using ImGuiWindowPtr = Entropy.UI.ImGUI.ImGuiWindowPtr;
 
 namespace Entropy.UI.ImGUI;
 

@@ -2,27 +2,10 @@
 using ImGuiNET;
 using ImGuiID = uint;
 using ImS8 = sbyte;
+using ImGuiWindowPtr = Entropy.UI.ImGUI.ImGuiWindowPtr;
 
 namespace Entropy.UI.ImGUI;
 
-public struct ImGuiMultiSelectStatePtr
-{
-#pragma warning disable CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
-	public unsafe ImGuiMultiSelectState* NativePtr { get; }
-	public unsafe ImGuiMultiSelectStatePtr(ImGuiMultiSelectState* nativePtr) => NativePtr = nativePtr;
-
-	public unsafe ImGuiMultiSelectStatePtr(IntPtr nativePtr) =>
-		NativePtr = (ImGuiMultiSelectState*)(void*)nativePtr;
-
-	public static unsafe implicit operator ImGuiMultiSelectStatePtr(ImGuiMultiSelectState* nativePtr) =>
-		new(nativePtr);
-
-	public static unsafe implicit operator ImGuiMultiSelectState*(ImGuiMultiSelectStatePtr wrappedPtr) =>
-		wrappedPtr.NativePtr;
-
-	public static implicit operator ImGuiMultiSelectStatePtr(IntPtr nativePtr) => new(nativePtr);
-#pragma warning restore CS8500 // This takes the address of, gets the size of, or declares a pointer to a managed type
-}
 public struct ImGuiMultiSelectState
 {
 	public ImGuiWindowPtr Window;

@@ -16,15 +16,15 @@ public unsafe struct ImChunkStream<T> where T : unmanaged
 		size = IM_MEMALIGN(HDR_SZ + size, 4u);
 		var off = this.Buf.Size;
 		this.Buf.Resize(off + (int)size);
-		((int*)this.Buf[off])[0] = (int)size;
-		return (T*)this.Buf[off + HDR_SZ];
+		((int*)this.Buf.GetPtr(off))[0] = (int)size;
+		return (T*)this.Buf.GetPtr(off + HDR_SZ);
 	}
 	public T* First()
 	{
 		var HDR_SZ = 4;
 		if(this.Buf.Size <= 0)
 			return null;
-		return (T*)this.Buf[HDR_SZ];
+		return (T*)this.Buf.GetPtr(HDR_SZ);
 	}
 	public T* GetNextChunk(T* p)
 	{
@@ -39,8 +39,8 @@ public unsafe struct ImChunkStream<T> where T : unmanaged
 		return p;
 	}
 	public int GetChunkSize(T* p) => ((int*)p)[-1];
-	public T* Last() => (T*)this.Buf[this.Buf.Size];
+	public T* Last() => (T*)this.Buf.GetPtr(this.Buf.Size);
 	public int OffsetFromPtr(T* p) => this.Buf.IndexFromPtr((byte*)p);
-	public T* PtrFromOffset(int off) => (T*)this.Buf[off];
+	public T* PtrFromOffset(int off) => (T*)this.Buf.GetPtr(off);
 }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

@@ -4,10 +4,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entropy", "Entropy\Entropy.csproj", "{BBC020CE-3ADC-4320-A4CC-1827E45AB7DF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{32C9559F-1B06-2ADC-AE1B-B3AE357237F6} = {32C9559F-1B06-2ADC-AE1B-B3AE357237F6}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoTrails", "Mods\NoTrails\NoTrails.csproj", "{0D874FB4-6113-C296-5245-BA3436E9ECA4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mods", "Mods", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImGuiRoslynGenerator", "ImGuiRoslynGenerator\ImGuiRoslynGenerator.csproj", "{32C9559F-1B06-2ADC-AE1B-B3AE357237F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +28,10 @@ Global
 		{0D874FB4-6113-C296-5245-BA3436E9ECA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D874FB4-6113-C296-5245-BA3436E9ECA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D874FB4-6113-C296-5245-BA3436E9ECA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32C9559F-1B06-2ADC-AE1B-B3AE357237F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32C9559F-1B06-2ADC-AE1B-B3AE357237F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32C9559F-1B06-2ADC-AE1B-B3AE357237F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32C9559F-1B06-2ADC-AE1B-B3AE357237F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

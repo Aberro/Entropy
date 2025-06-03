@@ -3,6 +3,7 @@ using ImGuiNET;
 using UnityEngine;
 using ImGuiID = uint;
 using ImGuiKeyChord = short;
+using ImGuiWindowPtr = Entropy.UI.ImGUI.ImGuiWindowPtr;
 
 namespace Entropy.UI.ImGUI;
 
