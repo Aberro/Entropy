@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Entropy": {
-      "commandName": "Executable",
-      "executablePath": "$(StationeersPath)rocketstation.exe",
-      "workingDirectory": "$(StationeersPath)"
-    }
-  }
-}
