@@ -1,31 +1,13 @@
-﻿using StationeersLibrary;
-using StationeersLibrary.Modding;
-using System.Reflection;
-using Entropy.Common;
+﻿using BepInEx.Configuration;
+using Entropy.Common.Mods;
 using UnityEngine;
 
 namespace Template;
 
-public class TemplateMod : Mod<TemplateMod>
+// A minimal mod declaration.
+public class TemplateMod : EntropyMod<TemplateMod>
 {
-	public static TemplateMod? Instance { get; private set; }
-
-	public override bool UseLogger => true;
-	public override bool UseConfig => true;
-	public override bool UseHarmony => true;
-
-	public override ModInfo Data => AssemblyUtils.GetModInfo(this);
-
-	public TemplateMod() : base() => Instance = this;
-
-	public override void OnLoaded(List<GameObject> prefabs) => base.OnLoaded(prefabs);
-
-	public override void OnStart() { }
-}
-
-public class TemplateModEx : ModEx<TemplateModEx>
-{
-	public static TemplateModEx? Instance { get; private set; }
-
-	public TemplateModEx() : base() => Instance = this;
+	// Could also use this overload for getting the list of prefabs or config file,
+	// though the latter is not recommended - config file is managed by Entropy framework.
+	// public override void OnLoaded(List<GameObject> prefabs, ConfigFile config) => base.OnLoaded(prefabs, config);
 }

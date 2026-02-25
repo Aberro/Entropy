@@ -3,19 +3,10 @@
 		<ModName>$(MSBuildProjectName)</ModName>
 		<AssemblyName>$(ModName)</AssemblyName>
 		<RootNamespace>$(ModName)</RootNamespace>
+		<GenerateAbout>true</GenerateAbout>
 	</PropertyGroup>
 
-	<!-- Import Stationeers VS properties - paths etc. -->
-	<Import Project="$(SolutionDir)Stationeers.VS.props" />
-
-	<!-- Import Game/Unity DLL references -->
-	<Import Project="$(SolutionDir)Stationeers.VS.References.props" />
-
 	<ItemGroup>
-		<ProjectReference Include="$(SolutionDir)\Source\StationeersLibrary\StationeersLibrary.csproj">
-			<SpecificVersion>False</SpecificVersion>
-			<Private>False</Private>
-		</ProjectReference>
 		<ProjectReference Include="$(SolutionDir)\Source\Entropy.Common\Entropy.Common.csproj">
 			<SpecificVersion>False</SpecificVersion>
 			<Private>False</Private>

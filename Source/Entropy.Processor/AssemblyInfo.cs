@@ -2,7 +2,7 @@
 using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.Processor")]
-[assembly: AssemblyVersion("1.0.0.305")]
+[assembly: AssemblyVersion("1.0.0.306")]
 [assembly: AssemblyDescription(@"
 		[h1]Entropy.Processor[/h1]
 

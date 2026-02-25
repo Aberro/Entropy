@@ -3,7 +3,7 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.Common")]
 [assembly: AssemblyCompany("Aberro")]
-[assembly: AssemblyVersion("1.0.0.450")]
+[assembly: AssemblyVersion("1.0.0.451")]
 [assembly: AssemblyDescription(@"
 		[h1]Entropy.Common[/h1]
 		
