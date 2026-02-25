@@ -452,7 +452,7 @@ public class SlotVariablesHelp : HelpWindow
 		else
 			CodeEditorMod.Instance.Logger.LogError("Could not find ScriptHelpWindow prefab");
 	}
-	public SlotVariablesHelp() : base("Functions")
+	public SlotVariablesHelp() : base("Slot Variables")
 	{
 		foreach (var logicSlotType in Logicable.LogicSlotTypes)
 		{

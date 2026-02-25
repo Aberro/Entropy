@@ -11,11 +11,15 @@
 
 		Advanced source code editor for programmable chips in Stationeers.
 
+		Source code: https://github.com/Aberro/Entropy
+
 		[b]WARNING:[/b] This is a StationeersLaunchPad Plugin Mod. It requires Bepinex to be installed with the StationeersLaunchPad plugin.
 		See: https://github.com/StationeersLaunchPad/StationeersLaunchPad</Description>
 	<InGameDescription><![CDATA[<align="center"><size="30"><b><color=#ffa500>Entropy.CodeEditor</color></b></size></align>
 Advanced source code editor for programmable chips in Stationeers.
 Supports syntax highlighting, built-in color themes, color theme customization, importing/exporting code, auto-pausing the game, and it's much more performant than default code editor.
+
+Source code: https://github.com/Aberro/Entropy
 
 <color=#ff0000><b>WARNING:</b></color> This is a <b>StationeersLaunchPad</b> Plugin Mod. It requires <b>Bepinex</b> to be installed with the <b>StationeersLaunchPad</b> plugin.
 See: <link="https://github.com/StationeersLaunchPad/StationeersLaunchPad">https://github.com/StationeersLaunchPad/StationeersLaunchPad</link>
@@ -23,7 +27,7 @@ See: <link="https://github.com/StationeersLaunchPad/StationeersLaunchPad">https:
 	<ChangeLog>
 
 	</ChangeLog>
-	<WorkshopHandle>0</WorkshopHandle>
+	<WorkshopHandle>3673139847</WorkshopHandle>
 	<Tags />
 
 

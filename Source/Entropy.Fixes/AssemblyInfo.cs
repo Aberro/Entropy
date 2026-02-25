@@ -3,7 +3,7 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.Fixes")]
 [assembly: AssemblyCompany("Aberro")]
-[assembly: AssemblyVersion("1.0.0.302")]
+[assembly: AssemblyVersion("1.0.0.304")]
 [assembly: AssemblyDescription(@"
 		[h1]Entropy.Fixes[/h1]
 
@@ -18,6 +18,9 @@ using System.Reflection;
 		*	Smaller Particles - this patch changes the size of gas particles to specified value, which makes them look better and less obtrusive.
 		*	No Trails - this patch removes trails from gas particles, which makes them look better and less obtrusive.
 
+		Discussion: https://discord.com/channels/1370137389837717545/1476117082906296451
+		Source code: https://github.com/Aberro/Entropy
+
 		[b]WARNING:[/b] This is a StationeersLaunchPad Plugin Mod. It requires Bepinex to be installed with the StationeersLaunchPad plugin.
 		See: https://github.com/StationeersLaunchPad/StationeersLaunchPad")]
 [assembly: AssemblyMetadata("InGameDescription", @"<![CDATA[<align=""center""><size=""30""><b><color=#ffa500>Entropy.Fixes</color></b></size></align>
@@ -28,11 +31,14 @@ Contains various minor fixes or tweaks for Stationeers not covered by other mods
 *<indent=5%><b>Smaller Particles</b> - this patch changes the size of gas particles to specified value, which makes them look better and less obtrusive.</indent>
 *<indent=5%><b>No Trails</b> - this patch removes trails from gas particles, which makes them look better and less obtrusive.</indent>
 
+Discussion: https://discord.com/channels/1370137389837717545/1476117082906296451
+Source code: https://github.com/Aberro/Entropy
+
 <color=#ff0000><b>WARNING:</b></color> This is a <b>StationeersLaunchPad</b> Plugin Mod. It requires <b>Bepinex</b> to be installed with the <b>StationeersLaunchPad</b> plugin.
 See: <link=""https://github.com/StationeersLaunchPad/StationeersLaunchPad"">https://github.com/StationeersLaunchPad/StationeersLaunchPad</link>
 ]]>")]
 [assembly: AssemblyMetadata("GameType", GameType.Both)]
-[assembly: AssemblyMetadata("WorkshopHandle", "0")]
+[assembly: AssemblyMetadata("WorkshopHandle", "3673139243")]
 [assembly: AssemblyMetadata("Tags", Tags.Mod)]
 [assembly: AssemblyMetadata("Tags", Tags.StationeersLaunchPad)]
 [assembly: AssemblyMetadata("DependsOn", "ModID=\"Entropy.Common\"")]
