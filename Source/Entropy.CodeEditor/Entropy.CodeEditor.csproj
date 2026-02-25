@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<ModName>$(MSBuildProjectName)</ModName>
+		<AssemblyName>$(ModName)</AssemblyName>
+		<RootNamespace>$(ModName)</RootNamespace>
+		<GenerateAbout>true</GenerateAbout>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\Entropy.Common\Entropy.Common.csproj" />
+	</ItemGroup>
+
+</Project>

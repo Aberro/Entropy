@@ -1,0 +1,8 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<!-- Change this to the path to your Steam Library Directory -->
+		<SteamLibraryDirectory>E:\Games\SteamLibrary\steamapps\common\</SteamLibraryDirectory>
+		<!-- Change this to the path to your Unity installation Directory to switch the game into debug mode -->
+		<UnityDirectory>C:\Program Files\Unity 2022.3.7f1\2022.3.62f3</UnityDirectory>
+	</PropertyGroup>
+</Project>

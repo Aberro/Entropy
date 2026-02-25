@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<ModName>$(MSBuildProjectName)</ModName>
+		<AssemblyName>$(ModName)</AssemblyName>
+		<RootNamespace>$(ModName)</RootNamespace>
+		<GenerateAbout>true</GenerateAbout>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="$(SolutionDir)\Source\Entropy.Common\Entropy.Common.csproj">
+			<SpecificVersion>False</SpecificVersion>
+			<Private>False</Private>
+		</ProjectReference>
+	</ItemGroup>
+</Project>

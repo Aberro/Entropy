@@ -1,0 +1,47 @@
+﻿using System.Diagnostics.CodeAnalysis;
+
+//[assembly: SuppressMessage("Performance", "CA1805:Do not initialize unnecessarily")]
+//[assembly: SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes")]
+[assembly: SuppressMessage("Performance", "CA1819:Properties should not return arrays")]
+//[assembly: SuppressMessage("Performance", "CA1822:Mark members as static")]
+//[assembly: SuppressMessage("Performance", "CA1824:Mark assemblies with NeutralResourcesLanguageAttribute")]
+//[assembly: SuppressMessage("Performance", "CA1852:Seal internal types")]
+[assembly: SuppressMessage("Performance", "CA1859:Use concrete types when possible for improved performance")]
+[assembly: SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types")]
+
+//[assembly: SuppressMessage("Globalization", "CA1305:Specify IFormatProvider")]
+[assembly: SuppressMessage("Globalization", "CA1307:Specify StringComparison")]
+
+//[assembly: SuppressMessage("Usage", "CA2243:Attribute string literals should parse correctly")]
+//[assembly: SuppressMessage("Usage", "CS8602:Dereference of a possibly null reference")]
+//[assembly: SuppressMessage("Usage", "CS8601:Possible null reference assignment")]
+[assembly: SuppressMessage("Usage", "CA2201:Do not raise reserved exception types")]
+[assembly: SuppressMessage("Usage", "CA2225:Operator overloads have named alternates")]
+[assembly: SuppressMessage("Usage", "CA2227:Collection properties should be read only")]
+
+[assembly: SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores")]
+//[assembly: SuppressMessage("Naming", "CA1708:Identifiers should differ by more than case")]
+[assembly: SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix")]
+//[assembly: SuppressMessage("Naming", "CA1716:Identifiers should not match keywords")]
+[assembly: SuppressMessage("Naming", "CA1720:Identifier contains type name")]
+//[assembly: SuppressMessage("Naming", "CA1724:Type names should not match namespaces")]
+
+//[assembly: SuppressMessage("Style", "IDE0022:Use expression body for method")]
+//[assembly: SuppressMessage("Style", "IDE0009:Member access should be qualified")]
+//[assembly: SuppressMessage("Style", "IDE0058:Expression value is never used")]
+//[assembly: SuppressMessage("Style", "IDE0060:Remove unused parameter")]
+
+[assembly: SuppressMessage("Design", "CA1000:Do not declare static members on generic types")]
+[assembly: SuppressMessage("Design", "CA1002:Do not expose generic lists")]
+[assembly: SuppressMessage("Design", "CA1003:Use generic event handlers")] // this one is terrible!
+//[assembly: SuppressMessage("Design", "CA1016:Mark assemblies with AssemblyVersionAttribute")]
+[assembly: SuppressMessage("Design", "CA1019:")]
+[assembly: SuppressMessage("Design", "CA1031:Do not catch general exception types")]
+[assembly: SuppressMessage("Design", "CA1033:Interface methods should be callable by child types")]
+[assembly: SuppressMessage("Design", "CA1034:Nested types should not be visible")]
+[assembly: SuppressMessage("Design", "CA1050:Declare types in namespaces")]
+//[assembly: SuppressMessage("Design", "CA1051:Do not declare visible instance fields")]
+//[assembly: SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
+[assembly: SuppressMessage("Design", "CA1063:Implement IDisposable correctly")]
+//[assembly: SuppressMessage("Design", "CA1065:Do not raise exceptions in unexpected locations")]
+//[assembly: SuppressMessage("Design", "CA1998:Async method lacks 'await' operators and will run synchronously")]

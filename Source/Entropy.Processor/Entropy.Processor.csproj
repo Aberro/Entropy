@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<ModName>$(MSBuildProjectName)</ModName>
+		<AssemblyName>$(ModName)</AssemblyName>
+		<RootNamespace>$(ModName)</RootNamespace>
+		<GenerateAbout>true</GenerateAbout>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Entropy.Common\Entropy.Common.csproj" />
+		<Reference Include="Antlr4.Runtime.Standard">
+			<HintPath>GameData\Antlr4.Runtime.Standard.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+</Project>

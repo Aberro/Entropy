@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<ModName>$(MSBuildProjectName)</ModName>
+		<AssemblyName>$(ModName)</AssemblyName>
+		<RootNamespace>$(ModName)</RootNamespace>
+		<GenerateAbout>true</GenerateAbout>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<Target Name="SwitchToDebug" BeforeTargets="Build" Condition="Exists('$(UnityDirectory)Unity.exe')">
+		<Copy SourceFiles="$(UnityDirectory)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\WindowsPlayer.exe" DestinationFiles="$(StationeersDirectory)rocketstation.exe" SkipUnchangedFiles="false" />
+		<Copy SourceFiles="$(UnityDirectory)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\UnityPlayer.dll" DestinationFiles="$(StationeersDirectory)UnityPlayer.dll" SkipUnchangedFiles="false" />
+		<Copy SourceFiles="$(UnityDirectory)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\WinPixEventRuntime.dll" DestinationFiles="$(StationeersDirectory)WinPixEventRuntime.dll" SkipUnchangedFiles="false" />
+	</Target>
+</Project>

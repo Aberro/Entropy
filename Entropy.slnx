@@ -1,0 +1,42 @@
+<Solution>
+	<Folder Name="/Extras/">
+		<File Path=".gitattributes" />
+		<File Path=".gitignore" />
+		<File Path=".github/workflows/dotnet-desktop.yml" />
+		<File Path="LICENSE.md" />
+		<File Path="MODS.md" />
+		<File Path="README.md" />
+	</Folder>
+	<Folder Name="/Data/">
+		<File Path="Directory.Build.props" />
+		<File Path="Stationeers.VS.props" />
+		<File Path="Stationeers.VS.References.props" />
+		<File Path="Stationeers.VS.User.props" />
+	</Folder>
+	<Folder Name="/Mods/">
+		<Project Path="Source/Entropy.CodeEditor/Entropy.CodeEditor.csproj" Id="eaa17b6a-6f63-4871-93e8-c2a97f36a6cc">
+			<BuildType Solution="Publish|*" Project="Release" />
+		</Project>
+		<Project Path="Source/Entropy.Common/Entropy.Common.csproj" />
+		<Project Path="Source/Entropy.Fixes/Entropy.Fixes.csproj" Id="145b241f-d667-4baa-8395-d8dac6bf938b" />
+		<Project Path="Source/Entropy.Processor/Entropy.Processor.csproj" />
+	</Folder>
+	<Configurations>
+		<BuildType Name="Debug" />
+		<BuildType Name="Publish" />
+		<BuildType Name="Release" />
+	</Configurations>
+	<Folder Name="/Commands/">
+		<File Path="Commands/Increment-Version.ps1" />
+		<Project Path="Commands/AboutGenerator/AboutGenerator.csproj">
+			<Build Project="false" />
+		</Project>
+	</Folder>
+	<Folder Name="/Global/">
+		<File Path="Source/GlobalSuppressions.cs" />
+		<File Path="Source/Utils.cs" />
+	</Folder>
+	<Project Path="Template/Template.csproj">
+		<Build Project="false" />
+	</Project>
+</Solution>

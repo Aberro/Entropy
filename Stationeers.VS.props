@@ -1,0 +1,103 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Import Project="$(SolutionDir)Stationeers.VS.User.props" />
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<AnalysisLevel>latest-all</AnalysisLevel>
+		<LangVersion>preview</LangVersion>
+		<ErrorReport>none</ErrorReport>
+		<LanguageTargets>$(MSBuildToolsPath)\Microsoft.CSharp.targets</LanguageTargets>
+		
+		<NoStandardLibraries>true</NoStandardLibraries>
+		<NoStdLib>true</NoStdLib>
+		<NoConfig>true</NoConfig>
+		<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+		<GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+		<GenerateDocumentationFile >false</GenerateDocumentationFile >
+		<GenerateDependencyFile>false</GenerateDependencyFile>
+
+		<RepositoryType>git</RepositoryType>
+		<PackageProjectUrl>https://github.com/TerameTechYT/StationeersSharp</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/TerameTechYT/StationeersSharp</RepositoryUrl>
+		<PackageLicenseFile>$(SolutionDir)LICENSE.md</PackageLicenseFile>
+		<PackageReadmeFile>$(SolutionDir)README.md</PackageReadmeFile>
+
+		<Configurations>Debug;Release;Publish</Configurations>
+		<DebugType>embedded</DebugType>
+		<WarningLevel>4</WarningLevel>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<NoWarn>$(NoWarn);MSB3277</NoWarn>
+
+		<StationeersDirectory>$(SteamLibraryDirectory)\Stationeers</StationeersDirectory>
+
+		<!-- Do Not Change Anything Below -->
+		<StationeersDataDirectory>$(StationeersDirectory)\rocketstation_Data</StationeersDataDirectory>
+		<StationeersManagedDirectory>$(StationeersDataDirectory)\Managed</StationeersManagedDirectory>
+		<StationeersPluginsDirectory>$(StationeersDataDirectory)\Plugins</StationeersPluginsDirectory>
+		<StationeersResourcesDirectory>$(StationeersDataDirectory)\Resources</StationeersResourcesDirectory>
+		<StationeersStreamingAssetsDirectory>$(StationeersDataDirectory)\StreamingAssets</StationeersStreamingAssetsDirectory>
+		<StationeersDocumentsDirectory>$(UserProfile)\Documents\My Games\Stationeers</StationeersDocumentsDirectory>
+
+		<BIEDirectory>$(StationeersDirectory)\BepInEx</BIEDirectory>
+		<BIECoreDirectory>$(BIEDirectory)\core</BIECoreDirectory>
+		<BIEPatchersDirectory>$(BIEDirectory)\patchers</BIEPatchersDirectory>
+		<BIEPluginsDirectory>$(BIEDirectory)\plugins</BIEPluginsDirectory>
+
+		<StationeersLaunchPadDirectory>$(BIEPluginsDirectory)\StationeersLaunchPad</StationeersLaunchPadDirectory>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<CopyItemsGameData Include="$(ProjectDir)\GameData\**\*.*" />
+		<CopyItemsAbout Include="$(ProjectDir)\About\**\*.*" />
+		<CopyItemsTextures Include="$(ProjectDir)\Textures\**\*.*" />
+	</ItemGroup>
+
+	<Target Name="IncrementVersion" BeforeTargets="BeforeBuild" Condition="'$(Configuration)' != 'Publish'">
+		<Exec Command="powershell -File &quot;$(SolutionDir)\Commands\Increment-Version.ps1&quot;" ContinueOnError="true" />
+	</Target>
+
+	<Target Name="GenerateAboutFile" AfterTargets="Build" Inputs="$(TargetPath)" Outputs="$(OutputPath)About\About.xml" Condition="'$(GenerateAbout)' != '' and $(GenerateAbout)">
+		<Message Importance="High" Text="Generating About data from $(TargetPath)" />
+		<Exec Command='dotnet run --project "$(MSBuildProjectDirectory)\..\..\Commands\AboutGenerator\AboutGenerator.csproj" -- "$(TargetPath)" "$(OutputPath)..\Entropy.Common\Entropy.Common.dll" "$(MSBuildProjectDirectory)\About"' />
+	</Target>
+
+
+	<Target Name="PostBuild" AfterTargets="GenerateAboutFile" Condition="'$(Configuration)' != 'Publish'">
+		<RemoveDir Directories="$(StationeersDocumentsDirectory)\mods\$(ModName)" />
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(StationeersDocumentsDirectory)\mods\$(ModName)" ContinueOnError="false" />
+		<Copy SourceFiles="$(PackageLicenseFile)" DestinationFiles="$(StationeersDocumentsDirectory)\mods\$(ModName)\LICENSE.md" ContinueOnError="false" />
+		<Copy SourceFiles="@(CopyItemsGameData)" DestinationFolder="$(StationeersDocumentsDirectory)\mods\$(ModName)\GameData\%(RecursiveDir)" ContinueOnError="true" />
+		<Copy SourceFiles="@(CopyItemsAbout)" DestinationFolder="$(StationeersDocumentsDirectory)\mods\$(ModName)\About\%(RecursiveDir)" ContinueOnError="true" />
+		<Copy SourceFiles="@(CopyItemsTextures)" DestinationFolder="$(StationeersDocumentsDirectory)\mods\$(ModName)\Textures\%(RecursiveDir)" ContinueOnError="true" />
+	</Target>
+
+	<ItemGroup>
+		<!-- Extra File Compilations -->
+		<Compile Include="$(SolutionDir)Source\GlobalSuppressions.cs">
+			<Link>GlobalSuppressions.cs</Link>
+		</Compile>
+		<None Include="$(SolutionDir)\.editorConfig">
+			<Link>.editorConfig</Link>
+		</None>
+
+		<Compile Remove="bin\**" />
+		<Compile Remove="obj\**" />
+		<EmbeddedResource Remove="bin\**" />
+		<EmbeddedResource Remove="obj\**" />
+		<None Remove="bin\**" />
+		<None Remove="obj\**" />
+
+		<!-- README -->
+		<None Update="README.md">
+			<Pack>True</Pack>
+			<PackagePath>$(SolutionDir)</PackagePath>
+		</None>
+	</ItemGroup>
+</Project>
