@@ -3,7 +3,7 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.Fixes")]
 [assembly: AssemblyCompany("Aberro")]
-[assembly: AssemblyVersion("1.0.0.305")]
+[assembly: AssemblyVersion("1.0.0.311")]
 [assembly: AssemblyDescription(@"
 		[h1]Entropy.Fixes[/h1]
 
@@ -43,6 +43,11 @@ See: <link=""https://github.com/StationeersLaunchPad/StationeersLaunchPad"">http
 [assembly: AssemblyMetadata("Tags", Tags.StationeersLaunchPad)]
 [assembly: AssemblyMetadata("DependsOn", "ModID=\"Entropy.Common\"")]
 [assembly: AssemblyMetadata("OrderAfter", "ModID=\"Entropy.Common\"")]
-// Last processed commit: 
-// Last processed version: 1.0.0.0
-[assembly: AssemblyMetadata("ChangeLog", "")]
+// Last processed commit: fa5a5bd62b8fe8501252a35f0eca2e552773847a
+// Last processed version: 1.0.0.309
+[assembly: AssemblyMetadata("ChangeLog", @"
+	[h1]Update v1.0.0.307 to v1.0.0.309[/h1]
+	[list]
+		[*] updated .gitignore and added uncommited file.
+	[/list]
+")]

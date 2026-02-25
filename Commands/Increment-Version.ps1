@@ -80,25 +80,24 @@ if (-not $currentCommit) {
         Write-Host "No new commits since last version — changelog not updated."
     } else {
         $formattedCommits = $gitMessages | ForEach-Object { "`t`t[*] $_" }
-        $logBody = "[h1]Update v$lastProcessedVersion to v$newVersionString[/h1]`n`t[list]`n" + ($formattedCommits -join "`n") + "`n`t[/list]"
-
-        $changelogText = "[assembly: AssemblyMetadata(""ChangeLog"", @""`n`t$logBody`n"")]"
+        $logBody = "[h1]Update v$lastProcessedVersion to v$newVersionString[/h1]`r`n`t[list]`r`n" + ($formattedCommits -join "`r`n") + "`r`n`t[/list]"
+        $changelogText = "[assembly: AssemblyMetadata(""ChangeLog"", @""`r`n`t$logBody`r`n"")]"
         if ([regex]::IsMatch($content, $changelogPattern, [System.Text.RegularExpressions.RegexOptions]::Singleline) ) {
             $content = [regex]::Replace(
                 $content,
                 $changelogPattern,
-                '',
+                $changelogText,
                 [System.Text.RegularExpressions.RegexOptions]::Singleline
             )
         } else {
-            $content = "$content`n$changelogText"
+            $content = "$content`r`n$changelogText"
         }
 
         $commitComment = "// Last processed commit: $currentCommit"
         if ($content -match $commitCommentPattern) {
             $content = [regex]::Replace($content, $commitCommentPattern, $commitComment)
         } else {
-            $content += "`n$commitComment"
+            $content += "`r`n$commitComment"
         }
 
         $versionComment = "// Last processed version: $newVersionString"
@@ -106,7 +105,7 @@ if (-not $currentCommit) {
         if ($content -match $versionCommentPattern) {
             $content = [regex]::Replace($content, $versionCommentPattern, $versionComment)
         } else {
-            $content += "`n$versionComment"
+            $content += "`r`n$versionComment"
         }
 
         [System.IO.File]::WriteAllText($fullPath, $content, [System.Text.Encoding]::UTF8)

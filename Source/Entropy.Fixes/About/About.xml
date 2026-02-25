@@ -41,6 +41,11 @@ See: <link="https://github.com/StationeersLaunchPad/StationeersLaunchPad">https:
 ]]></InGameDescription>
 	<ChangeLog>
 
+	[h1]Update v1.0.0.307 to v1.0.0.309[/h1]
+	[list]
+		[*] updated .gitignore and added uncommited file.
+	[/list]
+
 	</ChangeLog>
 	<WorkshopHandle>3673139243</WorkshopHandle>
 	<Tags />

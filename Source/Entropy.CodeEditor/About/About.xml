@@ -28,6 +28,11 @@ See: <link="https://github.com/StationeersLaunchPad/StationeersLaunchPad">https:
 ]]></InGameDescription>
 	<ChangeLog>
 
+	[h1]Update v1.0.0.323 to v1.0.0.326[/h1]
+	[list]
+		[*] updated .gitignore and added uncommited file.
+	[/list]
+
 	</ChangeLog>
 	<WorkshopHandle>3673139847</WorkshopHandle>
 	<Tags />
