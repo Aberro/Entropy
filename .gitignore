@@ -1,7 +1,3 @@
-*.bat
-*.cmd
-*.ps1
-*.ps2
 *.exe
 *.dll
 *.obj
@@ -15,6 +11,7 @@ obj/
 Objects/
 !Build/**/*.dll
 
+Stationeers.VS.User.props
 /Unity/Library
 /Unity/Logs
 /Unity/Packages
