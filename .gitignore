@@ -9,7 +9,7 @@ obj/
 
 #
 Objects/
-!Build/**/*.dll
+Build/*.dll
 
 Stationeers.VS.User.props
 /Unity/Library
