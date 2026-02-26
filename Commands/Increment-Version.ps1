@@ -61,7 +61,7 @@ if ($content -match $commitCommentPattern) {
     exit 1
 }
 
-$changelogPattern = '\s*\[\s*assembly\s*\:\s*AssemblyMetadata\s*\(\s*"ChangeLog"\s*,\s*[@]?".*?"\s*\)\s*]'
+$changelogPattern = '\s*\[\s*assembly\s*\:\s*AssemblyMetadata\s*\(\s*AssemblyMetadata\.ChangeLog\s*,\s*[@]?".*?"\s*\)\s*]'
 $currentCommit = (git rev-parse HEAD).Trim()
 if (-not $currentCommit) {
     Write-Warning "Unable to get current commit hash"
@@ -81,7 +81,7 @@ if (-not $currentCommit) {
     } else {
         $formattedCommits = $gitMessages | ForEach-Object { "`t`t[*] $_" }
         $logBody = "[h1]Update v$lastProcessedVersion to v$newVersionString[/h1]`r`n`t[list]`r`n" + ($formattedCommits -join "`r`n") + "`r`n`t[/list]"
-        $changelogText = "[assembly: AssemblyMetadata(""ChangeLog"", @""`r`n`t$logBody`r`n"")]"
+        $changelogText = "`r`n[assembly: AssemblyMetadata(AssemblyMetadata.ChangeLog, @""`r`n`t$logBody`r`n"")]"
         if ([regex]::IsMatch($content, $changelogPattern, [System.Text.RegularExpressions.RegexOptions]::Singleline) ) {
             $content = [regex]::Replace(
                 $content,

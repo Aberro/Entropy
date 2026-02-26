@@ -3,41 +3,34 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.CodeEditor")]
 [assembly: AssemblyCompany("Aberro")]
-[assembly: AssemblyVersion("1.0.0.327")]
+[assembly: AssemblyVersion("1.0.0.359")]
 [assembly: AssemblyDescription(@"
-		[h1]Entropy.CodeEditor[/h1]
+[h1][color=#ffa500]Entropy.CodeEditor[/color][/h1][br]
+Advanced source code editor for programmable chips in Stationeers.[br]
+Supports syntax highlighting, built-in color themes, clipboard, color theme customization,
+ importing/exporting code from the device or network, auto-pausing the game, and it's much more performant than default code editor.[br]
+Discussion: [url=https://discord.com/channels/1370137389837717545/1476117082906296451]Discord[/url][br]
+Source code: [url=https://github.com/Aberro/Entropy]Github[/url][br]
+[b][color=#ff0000]WARNING:[/color][/b] This is a StationeersLaunchPad Plugin Mod. It requires Bepinex to be installed with the StationeersLaunchPad plugin.[br]
+See: [url=https://github.com/StationeersLaunchPad/StationeersLaunchPad]StationeersLaunchPad Github page[/url]")]
+[assembly: AssemblyMetadata(AssemblyMetadata.GameType, GameType.Client)]
+[assembly: AssemblyMetadata(AssemblyMetadata.WorkshopHandle, "3673139847")]
+[assembly: AssemblyMetadata(AssemblyMetadata.Tag, Tags.Mod)]
+[assembly: AssemblyMetadata(AssemblyMetadata.Tag, Tags.StationeersLaunchPad)]
+[assembly: AssemblyMetadata(AssemblyMetadata.Tag, Tags.UI)]
+[assembly: AssemblyMetadata(AssemblyMetadata.Tag, Tags.Scripting)]
+[assembly: AssemblyMetadata(AssemblyMetadata.Tag, Tags.QualityOfLife)]
+[assembly: AssemblyMetadata(AssemblyMetadata.DependsOn, "ModID=\"Entropy.Common\"")]
+[assembly: AssemblyMetadata(AssemblyMetadata.OrderAfter, "ModID=\"Entropy.Common\"")]
 
-		Advanced source code editor for programmable chips in Stationeers.
-
-		Discussion: https://discord.com/channels/1370137389837717545/1476117082906296451
-		Source code: https://github.com/Aberro/Entropy
-
-		[b]WARNING:[/b] This is a StationeersLaunchPad Plugin Mod. It requires Bepinex to be installed with the StationeersLaunchPad plugin.
-		See: https://github.com/StationeersLaunchPad/StationeersLaunchPad")]
-[assembly: AssemblyMetadata("InGameDescription", @"<![CDATA[<align=""center""><size=""30""><b><color=#ffa500>Entropy.CodeEditor</color></b></size></align>
-Advanced source code editor for programmable chips in Stationeers.
-Supports syntax highlighting, built-in color themes, color theme customization, importing/exporting code, auto-pausing the game, and it's much more performant than default code editor.
-
-Discussion: https://discord.com/channels/1370137389837717545/1476117082906296451
-Source code: https://github.com/Aberro/Entropy
-
-<color=#ff0000><b>WARNING:</b></color> This is a <b>StationeersLaunchPad</b> Plugin Mod. It requires <b>Bepinex</b> to be installed with the <b>StationeersLaunchPad</b> plugin.
-See: <link=""https://github.com/StationeersLaunchPad/StationeersLaunchPad"">https://github.com/StationeersLaunchPad/StationeersLaunchPad</link>
-]]>")]
-[assembly: AssemblyMetadata("GameType", GameType.Client)]
-[assembly: AssemblyMetadata("WorkshopHandle", "3673139847")]
-[assembly: AssemblyMetadata("Tags", Tags.Mod)]
-[assembly: AssemblyMetadata("Tags", Tags.StationeersLaunchPad)]
-[assembly: AssemblyMetadata("Tags", Tags.UI)]
-[assembly: AssemblyMetadata("Tags", Tags.Scripting)]
-[assembly: AssemblyMetadata("Tags", Tags.QualityOfLife)]
-[assembly: AssemblyMetadata("DependsOn", "ModID=\"Entropy.Common\"")]
-[assembly: AssemblyMetadata("OrderAfter", "ModID=\"Entropy.Common\"")]
-// Last processed commit: fa5a5bd62b8fe8501252a35f0eca2e552773847a
-// Last processed version: 1.0.0.326
-[assembly: AssemblyMetadata("ChangeLog", @"
-	[h1]Update v1.0.0.323 to v1.0.0.326[/h1]
+////////////////////////////////////
+// Code-generated: do not modify. //
+////////////////////////////////////
+// Last processed commit: 389837a7025f3e4fd5d147cca7e7428353f8fc59
+// Last processed version: 1.0.0.328
+[assembly: AssemblyMetadata(AssemblyMetadata.ChangeLog, @"
+	[h1]Update v1.0.0.326 to v1.0.0.328[/h1]
 	[list]
-		[*] updated .gitignore and added uncommited file.
+		[*] Fixed auto-version incrementing and changelog generation.
 	[/list]
 ")]

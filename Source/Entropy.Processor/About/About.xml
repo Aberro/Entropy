@@ -6,25 +6,32 @@
 	<Name>Entropy.Processor</Name>
 	<Author></Author>
 	<Version>1.0</Version>
-	<Description>
-		[h1]Entropy.Processor[/h1]
-
-		Integrated Circuit processor replacement for Stationeers. Has better performance and supports easy extensibility.
-
-		[b]WARNING:[/b] This is a StationeersLaunchPad Plugin Mod. It requires Bepinex to be installed with the StationeersLaunchPad plugin.
-		See: https://github.com/StationeersLaunchPad/StationeersLaunchPad</Description>
-	<InGameDescription>
-<![CDATA[<size="30"><color=#ffa500>Entropy.Processor</color></size>
-
+	<Description>[h1]Entropy.Processor[/h1]
 Integrated Circuit processor replacement for Stationeers. Has better performance and supports easy extensibility.
-
-<b>WARNING:</b> <color=#ff0000>This is a StationeersLaunchPad Plugin Mod. It requires Bepinex to be installed with the StationeersLaunchPad plugin.</color>
-See: https://github.com/StationeersLaunchPad/StationeersLaunchPad]]></InGameDescription>
+Discussion: [url=https://discord.com/channels/1370137389837717545/1476117082906296451]Discord[/url]
+Source code: [url=https://github.com/Aberro/Entropy]Github[/url]
+[b]WARNING:[/b] This is a StationeersLaunchPad Plugin Mod. It requires Bepinex to be installed with the StationeersLaunchPad plugin.
+See: [url=https://github.com/StationeersLaunchPad/StationeersLaunchPad]StationeersLaunchPad Github page[/url]</Description>
+	<InGameDescription><![CDATA[<size="30"><color=#ffa500>Entropy.Processor</color></size>
+Integrated Circuit processor replacement for Stationeers. Has better performance and supports easy extensibility.
+Discussion: <color=#90D5FF><u><link="https://discord.com/channels/1370137389837717545/1476117082906296451">Discord</link></u></color>
+Source code: <color=#90D5FF><u><link="https://github.com/Aberro/Entropy">Github</link></u></color>
+<b><color=#ff0000>WARNING:</color></b> This is a StationeersLaunchPad Plugin Mod. It requires Bepinex to be installed with the StationeersLaunchPad plugin.
+See: <color=#90D5FF><u><link="https://github.com/StationeersLaunchPad/StationeersLaunchPad">StationeersLaunchPad Github page</link></u></color>]]></InGameDescription>
 	<ChangeLog>
+
+	[h1]Update v1.0.0.456 to v1.0.0.458[/h1]
+	[list]
+		[*] Fixed auto-version incrementing and changelog generation.
+	[/list]
 
 	</ChangeLog>
 	<WorkshopHandle>0</WorkshopHandle>
-	<Tags />
+	<Tags>
+		<Tag>Mod</Tag>
+		<Tag>StationeersLaunchPad</Tag>
+		<Tag>Scripting</Tag>
+	</Tags>
 
 
 	<OrderAfter ModID="Entropy.Common" />

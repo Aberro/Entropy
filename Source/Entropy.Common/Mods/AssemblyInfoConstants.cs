@@ -1,5 +1,17 @@
 ﻿namespace Entropy.Common.Mods;
 
+public static class AssemblyMetadata
+{
+	public const string InGameDescription = "InGameDescription";
+	public const string GameType = "GameType";
+	public const string WorkshopHandle = "WorkshopHandle";
+	public const string Tag = "Tag";
+	public const string DependsOn = "DependsOn";
+	public const string IncompatibleWith = "IncompatibleWith";
+	public const string OrderBefore = "OrderBefore";
+	public const string OrderAfter = "OrderAfter";
+	public const string ChangeLog = "ChangeLog";
+}
 public static class Tags
 {
 	public const string Mod = "Mod";

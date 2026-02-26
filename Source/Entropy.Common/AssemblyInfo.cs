@@ -3,39 +3,47 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.Common")]
 [assembly: AssemblyCompany("Aberro")]
-[assembly: AssemblyVersion("1.0.0.457")]
-[assembly: AssemblyDescription(@"
-		[h1]Entropy.Common[/h1]
-		
-		A Stationeers modding framework and utility library.
-		It contains common code and utilities for Entropy mods, automates configuration handling, provides easy API for drawing ImGUI controls,
-		has various helper types, and more, allowing for faster and easier development of mods.
-
-		Discussion: https://discord.com/channels/1370137389837717545/1476117082906296451
-		Source code: https://github.com/Aberro/Entropy
-
-		[b]WARNING:[/b] This is a StationeersLaunchPad Plugin Mod. It requires Bepinex to be installed with the StationeersLaunchPad plugin.
-		See: https://github.com/StationeersLaunchPad/StationeersLaunchPad")]
-[assembly: AssemblyMetadata("InGameDescription", @"<![CDATA[<align=""center""><size=""30""><b><color=#ffa500>Entropy.Common</color></b></size></align>
+[assembly: AssemblyVersion("1.0.0.488")]
+[assembly: AssemblyDescription(@"[center][h1][color=#ffa500]Entropy.Common[/color][/h1][/center][br]
 A Stationeers modding framework and utility library.
-It contains common code and utilities for Entropy mods, automates configuration handling, provides easy API for drawing ImGUI controls, has various helper types, and more, allowing for faster and easier development of mods.
+ It contains common code and utilities for Entropy mods, automates configuration handling, provides easy API for drawing ImGUI controls,
+ has various helper types, and more, allowing for faster and easier development of mods.[br]
+List of features:[br]
+[list][br]
+[*] Automatic About.xml generation based on assembly metadata, see Template in source code for example.[br]
+[*] Shared Steam and in-game description based on custom [noparse][BBCode][/noparse] flavor,
+see Template and AboutGenerator.Program.cs in source code.[br]
+[*] patch management - patch/unpatch on the fly[br]
+[*] configuration entries management[br]
+[*] objects extensions - additional data of any kind that can be assigned to existing reference types[br]
+[*] serializable extensions - any serializable extension data attached to an instance of a type derived from Thing[br]
+[*] in-project mod definition - About.xml is automatically generated based on assembly metadata[br]
+[*] ImGui extra features, convenience methods, and more native types mapped into C#[br]
+[*] Extra easy mod entry point declaration - just a class derived from EntryMod, nothing else is required.[br]
+[*] Optional[noparse]<>[/noparse] type - same as Nullable[noparse]<>[/noparse], but works both for reference and value types.[br]
+[*] Color converters extension methods[br]
+[*] ImGui transparency fix - multiple transparent drawcalls now blend more naturally,
+ instead of the topmost overriding transparency of underlaying graphics.[br]
+[/list][br]
+Discussion: [url=https://discord.com/channels/1370137389837717545/1476117082906296451]Discord[/url][br]
+Source code: [url=https://github.com/Aberro/Entropy]Github[/url][br]
+[b][color=#ff0000]WARNING:[/color][/b] 
+This is a StationeersLaunchPad Plugin Mod. It requires Bepinex to be installed with the StationeersLaunchPad plugin.[br]
+See: [url=https://github.com/StationeersLaunchPad/StationeersLaunchPad]StationeersLaunchPad Github page[/url]")]
+[assembly: AssemblyMetadata(AssemblyMetadata.GameType, "Both")]
+[assembly: AssemblyMetadata(AssemblyMetadata.WorkshopHandle, "3673138658")]
+[assembly: AssemblyMetadata(AssemblyMetadata.Tag, Tags.Mod)]
+[assembly: AssemblyMetadata(AssemblyMetadata.Tag, Tags.StationeersLaunchPad)]
+[assembly: AssemblyMetadata(AssemblyMetadata.Tag, Tags.Library)]
 
-Discussion: https://discord.com/channels/1370137389837717545/1476117082906296451
-Source code: https://github.com/Aberro/Entropy
-
-<color=#ff0000><b>WARNING:</b></color> This is a <b>StationeersLaunchPad</b> Plugin Mod. It requires <b>Bepinex</b> to be installed with the <b>StationeersLaunchPad</b> plugin.
-See: <link=""https://github.com/StationeersLaunchPad/StationeersLaunchPad"">https://github.com/StationeersLaunchPad/StationeersLaunchPad</link>
-]]>")]
-[assembly: AssemblyMetadata("GameType", "Both")]
-[assembly: AssemblyMetadata("WorkshopHandle", "3673138658")]
-[assembly: AssemblyMetadata("Tags", Tags.Mod)]
-[assembly: AssemblyMetadata("Tags", Tags.StationeersLaunchPad)]
-[assembly: AssemblyMetadata("Tags", Tags.Library)]
-// Last processed commit: fa5a5bd62b8fe8501252a35f0eca2e552773847a
-// Last processed version: 1.0.0.456
-[assembly: AssemblyMetadata("ChangeLog", @"
-	[h1]Update v1.0.0.453 to v1.0.0.456[/h1]
+////////////////////////////////////
+// Code-generated: do not modify. //
+////////////////////////////////////
+// Last processed commit: 389837a7025f3e4fd5d147cca7e7428353f8fc59
+// Last processed version: 1.0.0.458
+[assembly: AssemblyMetadata(AssemblyMetadata.ChangeLog, @"
+	[h1]Update v1.0.0.456 to v1.0.0.458[/h1]
 	[list]
-		[*] updated .gitignore and added uncommited file.
+		[*] Fixed auto-version incrementing and changelog generation.
 	[/list]
 ")]
