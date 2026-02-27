@@ -64,10 +64,6 @@ public static class ImGuiHelper
 		/// </summary>
 		private static uint entries;
 		private static ConditionalWeakTable<string, BufferBox> stringsTable = new();
-		public static Dictionary<ImGuiID, ImGuiVerticalTabBar> verticalTabBars = new();
-
-		public static ImGuiVerticalTabBar? CurrentVerticalTabBar { get; internal set; }
-		public static Stack<ImGuiVerticalTabBar> CurrentTabBarStack { get; } = new();
 
 		/// <summary>
 		/// Gets a pointer to a UTF8 byte buffer for the given string.
@@ -119,12 +115,6 @@ public static class ImGuiHelper
 				len++;
 			return Encoding.UTF8.GetString(strPtr, len);
 		}
-	}
-
-	private class ImGuiVerticalTabBar
-	{
-		public uint ID { get; internal set; }
-		public bool WantLayout { get; internal set; }
 	}
 
 	private static TextureManager _textureManager = null!;
@@ -1122,28 +1112,6 @@ public static class ImGuiHelper
 		{
 			body();
 			ImGui.EndTabBar();
-		}
-		return result;
-	}
-
-	public static bool VerticalTabItem(string label, ImGuiTabItemFlags flags = ImGuiTabItemFlags.None)
-	{
-		throw new NotSupportedException("This feature is not supported yet");
-		//var tab_bar = ImGuiHelperInternals.CurrentVerticalTabBar;
-		//if(tab_bar is null)
-		//	throw new InvalidOperationException("Needs to be called between BeginTabBar() and EndTabBar() or inside VerticalTabBar callback action!");
-		//if(tab_bar.WantLayout)
-		//	TabBarLayout(tab_bar);
-	}
-	/// <exception cref="ArgumentNullException">Thrown when the <paramref name="body"/> action is null.</exception>
-	public static unsafe bool VerticalTabBar(string str_id, ImGuiTabBarFlags flags, Action body)
-	{
-		ArgumentNullException.ThrowIfNull(body);
-		var result = BeginVerticalTabBar(str_id, flags);
-		if(result)
-		{
-			body();
-			EndVerticalTabBar();
 		}
 		return result;
 	}

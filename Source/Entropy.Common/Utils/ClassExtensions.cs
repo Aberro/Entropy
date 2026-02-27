@@ -230,7 +230,7 @@ public static class ExtensionsSerializationPatches
 	{
 		if (__result is null)
 			return;
-		_loadedThings.Add(__result.ReferenceId, new WeakReference<Thing>(__result));
+		_loadedThings[__result.ReferenceId] = new WeakReference<Thing>(__result);
 	}
 	// We simply need a point at which we can clear the dictionary safely after it's been used.
 	[HarmonyPatch(typeof(PlanetaryAtmosphereSimulation), nameof(PlanetaryAtmosphereSimulation.Load))]

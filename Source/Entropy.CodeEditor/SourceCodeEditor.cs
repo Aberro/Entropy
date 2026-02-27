@@ -179,7 +179,7 @@ public class SourceCodeEditor : ImGuiWindow, IModal
 		this._textEditor = new TextEditor(IC10LanguageDefinition.Definition);
 	}
 
-	private static SourceCodeEditor _instance;
+	private static SourceCodeEditor? _instance;
 	public static void Open(ProgrammableChipMotherboard motherboard)
 	{
 		PanelToolTip.Instance.ClearToolTip();

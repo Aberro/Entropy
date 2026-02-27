@@ -8,21 +8,32 @@
 	<Version>1.0</Version>
 	<Description>[h1]Entropy.Processor[/h1]
 Integrated Circuit processor replacement for Stationeers. Has better performance and supports easy extensibility.
+[h2]Uninstall[h2]
+To remove all Entropy mods safely, follow this instruction:
+[olist][*] Remove all Entropy mods except [b]Entropy.Common[/b]
+[*] Load and save the game, exit
+[*] Remove [b]Entropy.Common[/b] mod.
+[/olist]
 Discussion: [url=https://discord.com/channels/1370137389837717545/1476117082906296451]Discord[/url]
 Source code: [url=https://github.com/Aberro/Entropy]Github[/url]
 [b]WARNING:[/b] This is a StationeersLaunchPad Plugin Mod. It requires Bepinex to be installed with the StationeersLaunchPad plugin.
 See: [url=https://github.com/StationeersLaunchPad/StationeersLaunchPad]StationeersLaunchPad Github page[/url]</Description>
 	<InGameDescription><![CDATA[<size="30"><color=#ffa500>Entropy.Processor</color></size>
 Integrated Circuit processor replacement for Stationeers. Has better performance and supports easy extensibility.
+<h2>Uninstall<h2>
+To remove all Entropy mods safely, follow this instruction:
+ 1.<indent=3em>Remove all Entropy mods except <b>Entropy.Common</b></indent>
+ 2.<indent=3em>Load and save the game, exit</indent>
+ 3.<indent=3em>Remove <b>Entropy.Common</b> mod.</indent>
 Discussion: <color=#90D5FF><u><link="https://discord.com/channels/1370137389837717545/1476117082906296451">Discord</link></u></color>
 Source code: <color=#90D5FF><u><link="https://github.com/Aberro/Entropy">Github</link></u></color>
 <b><color=#ff0000>WARNING:</color></b> This is a StationeersLaunchPad Plugin Mod. It requires Bepinex to be installed with the StationeersLaunchPad plugin.
 See: <color=#90D5FF><u><link="https://github.com/StationeersLaunchPad/StationeersLaunchPad">StationeersLaunchPad Github page</link></u></color>]]></InGameDescription>
 	<ChangeLog>
 
-	[h1]Update v1.0.0.456 to v1.0.0.458[/h1]
+	[h1]Update v1.0.0.458 to v1.0.0.344[/h1]
 	[list]
-		[*] Fixed auto-version incrementing and changelog generation.
+		[*] Fixes to Increment-Version.ps1. Made InGameDescription assembly attribute optional, added automatic conversion from [BBCode] to Unity's TMP's markup. Added support for steam unsupported [BBCode] attributes (those are used in generated in-game description and removed from description) Added [br] tag instead of line breaks for better formatting in AssemblyInfo.cs files. Extended Entropy.Common description.
 	[/list]
 
 	</ChangeLog>

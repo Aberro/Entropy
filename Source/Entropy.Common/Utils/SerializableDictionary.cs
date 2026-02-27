@@ -1,5 +1,7 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Runtime.Serialization;
+using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -39,58 +41,104 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IX
 		if (!typeof(TKey).IsPrimitive && Type.GetTypeCode(typeof(TKey)) != TypeCode.String)
 			keySerializer = new XmlSerializer(typeof(TKey));
 
-		reader.ReadStartElement();
+		ConsumeWhitespace(reader);
+		var tableName = reader.Name;
+		var tableDepth = reader.Depth;
+		reader.Read(); // Consume the start element.
+		//reader.ReadStartElement(); 
 
 		while (reader.IsStartElement("Item"))
 		{
+			reader.ReadStartElement("Item"); // Read the item start element. It should have no attributes.
+
+			var key = ReadKeyElement(reader, keySerializer);
+			var value = ReadValueElement(reader, tableDepth);
+
+			if (value.HasValue)
+				this.Add(key, value.Value);
+			if (reader.NodeType != XmlNodeType.EndElement || reader.Name != "Item")
+				throw new ApplicationException("Error during deserialization: invalid element name!");
+			reader.ReadEndElement();
+			ConsumeWhitespace(reader);
+		}
+		if (reader.NodeType != XmlNodeType.EndElement || reader.Name != tableName)
+			throw new ApplicationException("Error during deserialization: unexpected node!");
+		reader.ReadEndElement();
+
+		static TKey ReadKeyElement(XmlReader reader, XmlSerializer? keySerializer)
+		{
 			TKey key;
-			TValue value = default!;
-			var valueDeserialized = false;
-			reader.ReadStartElement("Item");
-			// I FUCKING HATE XML!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			// From here on we're in samurai mode. Samurai do not think how and why it works nor supposed to work, samurai only sees his goal.
+			ConsumeWhitespace(reader);
 			if (keySerializer is not null)
 			{
-				reader.ReadStartElement("Key");
-				key = (TKey) keySerializer.Deserialize(reader);
-				reader.ReadEndElement();
+				reader.ReadStartElement("Key"); // First element in an item should be the key, so read it.
+				key = (TKey) keySerializer.Deserialize(reader); // Then deserialize the key's value.
+				reader.ReadEndElement(); // Consume closing </Key> tag.
 			}
 			else
 			{
-				reader.Read();
-				var attr = reader.GetAttribute("key");
-				key = (TKey) Convert.ChangeType(attr, typeof(TKey), CultureInfo.InvariantCulture);
-				reader.Read();
+				if (reader.Name != "Key")
+					throw new ApplicationException("Error during deserialization: invalid element name!");
+				var attr = reader.GetAttribute("key"); // The attribute that stores key's primitive value.
+				key = (TKey) Convert.ChangeType(attr, typeof(TKey), CultureInfo.InvariantCulture); // Convert the string key value into the target primitive value.
+				reader.Read(); // Consume the <Key ... /> element.
 			}
-			//reader.ReadEndElement();
-
-			reader.Read();
+			ConsumeWhitespace(reader);
+			return key;
+		}
+		static Optional<TValue> ReadValueElement(XmlReader reader, int tableDepth)
+		{
+			Optional<TValue> value = default;
+			ConsumeWhitespace(reader);
 			try
 			{
+				if (reader.Name != "Value")
+					throw new ApplicationException("Error during deserialization: invalid element name!");
 				var typeFullName = reader.GetAttribute("type");
 				var valueType = typeFullName != null ? Type.GetType(typeFullName, false) : null;
-				reader.Read();
-				if (valueType is not null && valueType != typeof(void))
-				{
-					var valueSerializer = GetSerializer(valueType);
-					value = (TValue) valueSerializer.Deserialize(reader);
-					valueDeserialized = true;
-				}
-				else
-					CommonMod.Instance.Logger.LogWarning($"Could not deserialize {typeFullName}");
+				reader.Read(); // consume the <Value ...> element.
+				value = ReadValue(reader, valueType, typeFullName, tableDepth);
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 				CommonMod.Instance.Logger.LogException(e);
 			}
-			reader.ReadEndElement();
 
-			reader.ReadEndElement();
-
-			if (valueDeserialized)
-				this.Add(key, value!);
+			if (reader.NodeType != XmlNodeType.EndElement && reader.Name != "Value")
+				throw new ApplicationException("Error during deserialization: unexpected node!");
+			reader.ReadEndElement(); // Consume the </Value> tag.
+			ConsumeWhitespace(reader);
+			return value;
 		}
-		reader.ReadEndElement();
+		static Optional<TValue> ReadValue(XmlReader reader, Type? valueType, string? typeFullName, int tableDepth)
+		{
+			Optional<TValue> value = default;
+			ConsumeWhitespace(reader);
+			if (valueType is not null && valueType != typeof(void))
+			{
+				var valueSerializer = GetSerializer(valueType);
+				value = (TValue) valueSerializer.Deserialize(reader);
+			}
+			else
+			{
+				CommonMod.Instance.Logger.LogWarning($"Could not deserialize {typeFullName}");
+				// Consume elements until we're at next element or the end 
+				while (reader.Read())
+				{
+					if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "Value")
+						break;
+					if (reader.Depth <= tableDepth + 1)
+						throw new ApplicationException("Error during deserialization: failed to read value!");
+				}
+			}
+			ConsumeWhitespace(reader);
+			return value;
+		}
+		static void ConsumeWhitespace(XmlReader reader)
+		{
+			while (reader.NodeType == XmlNodeType.Whitespace)
+				reader.Read();
+		}
 	}
 
 	public void WriteXml(XmlWriter writer)
