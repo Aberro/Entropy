@@ -9,8 +9,7 @@
 	<Description>[h1]Entropy.CodeEditor[/h1]
 Advanced source code editor for programmable chips in Stationeers.
 Supports syntax highlighting, built-in color themes, clipboard, color theme customization, importing/exporting code from the device or network, auto-pausing the game, and it&apos;s much more performant than default code editor.
-
-[h2]Uninstall[h2]
+[h2]Uninstall[/h2]
 To remove this mod safely, follow this instruction:
 [olist][*] Remove only this mod (do not remove [b]Entropy.Common[/b])
 [*] Load and save the game
@@ -23,8 +22,7 @@ See: [url=https://github.com/StationeersLaunchPad/StationeersLaunchPad]Stationee
 	<InGameDescription><![CDATA[<size="30"><color=#ffa500>Entropy.CodeEditor</color></size>
 Advanced source code editor for programmable chips in Stationeers.
 Supports syntax highlighting, built-in color themes, clipboard, color theme customization, importing/exporting code from the device or network, auto-pausing the game, and it's much more performant than default code editor.
-
-<h2>Uninstall<h2>
+<size="24">Uninstall</size>
 To remove this mod safely, follow this instruction:
  1.<indent=3em>Remove only this mod (do not remove <b>Entropy.Common</b>)</indent>
  2.<indent=3em>Load and save the game</indent>
@@ -35,9 +33,9 @@ Source code: <color=#90D5FF><u><link="https://github.com/Aberro/Entropy">Github<
 See: <color=#90D5FF><u><link="https://github.com/StationeersLaunchPad/StationeersLaunchPad">StationeersLaunchPad Github page</link></u></color>]]></InGameDescription>
 	<ChangeLog>
 
-	[h1]Update v1.0.0.328 to v1.0.0.360[/h1]
+	[h1]Update v1.0.0.360 to v1.0.0.374[/h1]
 	[list]
-		[*] Fixes to Increment-Version.ps1. Made InGameDescription assembly attribute optional, added automatic conversion from [BBCode] to Unity's TMP's markup. Added support for steam unsupported [BBCode] attributes (those are used in generated in-game description and removed from description) Added [br] tag instead of line breaks for better formatting in AssemblyInfo.cs files. Extended Entropy.Common description.
+		[*] Fixed SerializableDictionary, updated AssemblyInfo.cs to include uninstall process. Removed VerticalTabBar from ImGui - not planned for implementation, at least not yet and not in observable future. Fix for XmlSaveLoadLoadThingPrefix patch method - for some reason Thing might be repeated more than once, might've been an issue with deserialization, but either way it's better to overwrite than to ensure exclusivity.
 	[/list]
 
 	</ChangeLog>
