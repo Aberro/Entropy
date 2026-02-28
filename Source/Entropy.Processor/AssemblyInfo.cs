@@ -2,7 +2,7 @@
 using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.Processor")]
-[assembly: AssemblyVersion("1.0.0.361")]
+[assembly: AssemblyVersion("1.0.0.382")]
 [assembly: AssemblyDescription(@"
 [h1][color=#ffa500]Entropy.Processor[/color][/h1][br]
 Integrated Circuit processor replacement for Stationeers. Has better performance and supports easy extensibility.[br]
@@ -26,11 +26,11 @@ See: [url=https://github.com/StationeersLaunchPad/StationeersLaunchPad]Stationee
 [assembly: AssemblyMetadata(AssemblyMetadata.DependsOn, "ModID=\"Entropy.Common\"")]
 [assembly: AssemblyMetadata(AssemblyMetadata.OrderAfter, "ModID=\"Entropy.Common\"")]
 
-// Last processed commit: 2a1eadd0d4edfe01b9371d6f2b9cb2b01af78459
-// Last processed version: 1.0.0.358
+// Last processed commit: c0edee4aea26a065630eb0965049bd7bd5ad80ac
+// Last processed version: 1.0.0.362
 [assembly: AssemblyMetadata(AssemblyMetadata.ChangeLog, @"
-	[h1]Update v1.0.0.344 to v1.0.0.358[/h1]
+	[h1]Update v1.0.0.358 to v1.0.0.362[/h1]
 	[list]
-		[*] Fixed SerializableDictionary, updated AssemblyInfo.cs to include uninstall process. Removed VerticalTabBar from ImGui - not planned for implementation, at least not yet and not in observable future. Fix for XmlSaveLoadLoadThingPrefix patch method - for some reason Thing might be repeated more than once, might've been an issue with deserialization, but either way it's better to overwrite than to ensure exclusivity.
+		[*] Minor corrections in AssemblyInfo.cs.
 	[/list]
 ")]

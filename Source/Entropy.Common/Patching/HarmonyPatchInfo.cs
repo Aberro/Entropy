@@ -1,13 +1,17 @@
-﻿using BepInEx.Harmony;
+﻿using Assets.Scripts.UI;
+using BepInEx.Harmony;
+using Cysharp.Threading.Tasks;
 using Entropy.Common.Attributes;
 using Entropy.Common.Configs;
 using Entropy.Common.Mods;
 using Entropy.Common.Utils;
 using HarmonyLib;
+using HarmonyLib.Tools;
 using LaunchPadBooster;
 using LaunchPadBooster.Patching;
 using SimpleSpritePacker;
 using System.Collections;
+using System.Diagnostics;
 using System.Reflection;
 using AccessTools = HarmonyLib.AccessTools;
 
@@ -83,7 +87,7 @@ public class HarmonyPatchInfo
 	/// <param name="mod">The mod that this patch belongs to.</param>
 	/// <param name="declaringType">The type to try to create a patch from.</param>
 	/// <returns>Returns a new instance of <see cref="HarmonyPatchInfo"/> if the type contains harmony patch attributes, otherwise null.</returns>
-	public static IEnumerable<HarmonyPatchInfo> Create(EntropyModBase mod, Harmony harmony, Type declaringType)
+	public static IEnumerable<HarmonyPatchInfo?> Create(EntropyModBase mod, Harmony harmony, Type declaringType)
 	{
 		ArgumentNullException.ThrowIfNull(mod);
 		ArgumentNullException.ThrowIfNull(declaringType);
@@ -174,8 +178,8 @@ public class HarmonyPatchInfo
 		Func<bool>? prepareUnpatchInvocation = null;
 		Action? cleanupUnpatchInvocation = null;
 		{
-			var prepareUnpatch = AccessTools.Method(declaringType, "PrepareUnpatch");
-			var cleanupUnpatch = AccessTools.Method(declaringType, "CleanupUnpatch");
+			var prepareUnpatch = AccessTools.GetDeclaredMethods(declaringType).FirstOrDefault(x => x.Name == "PrepareUnpatch");
+			var cleanupUnpatch = AccessTools.GetDeclaredMethods(declaringType).FirstOrDefault(x => x.Name == "CleanupUnpatch");
 			if (prepareUnpatch is not null)
 			{
 				var prepareUnpatchParameters = AccessTools.ActualParameters(prepareUnpatch, [harmony]);
@@ -203,13 +207,69 @@ public class HarmonyPatchInfo
 						newHarmonyMethod.method = harmonyMethod.method;
 						newHarmonyMethod.declaringType = methodInfo.DeclaringType;
 						newHarmonyMethod.methodName = methodInfo.Name;
-						yield return new HarmonyPatchInfo(mod, declaringType, newHarmonyMethod, harmonyPatchType, prepareMethodInvocation, cleanupMethodInvocation, prepareUnpatchInvocation, cleanupUnpatchInvocation);
+						yield return new HarmonyPatchInfo(
+							mod,
+							declaringType,
+							newHarmonyMethod,
+							harmonyPatchType,
+							prepareMethodInvocation,
+							cleanupMethodInvocation,
+							prepareUnpatchInvocation,
+							cleanupUnpatchInvocation);
 					}
 				} else
 				{
 					if (harmonyMethod.method is null)
+					{
+						CommonMod.Instance.Logger.LogWarning($"Could not find patch method(s) in {declaringType.FullName} marked with [HarmonyPatch] attribute!");
 						continue; // target method is undefined, this is probably TargetMethod(s) patch
-					yield return new HarmonyPatchInfo(mod, declaringType, harmonyMethod, harmonyPatchType, prepareMethodInvocation, cleanupMethodInvocation, prepareUnpatchInvocation, cleanupUnpatchInvocation);
+					}
+					var declaringMethod = harmonyMethod.method;
+					var validateCrc = declaringMethod.GetCustomAttribute<PatchValidateCrcAttribute>();
+					if (validateCrc != null)
+					{
+						var originalMethod = GetOriginalMethod(declaringType, harmonyMethod);
+						var crc = Hash64.HashToUInt64(originalMethod.GetMethodBody().GetILAsByteArray());
+						if (validateCrc.CRC != crc)
+						{
+							CommonMod.Instance.Logger.LogError($"Target method `{originalMethod.DeclaringType.FullName}.{originalMethod.Name}` for patch {declaringType.Name}.{declaringMethod} CRC validation failed: expected {validateCrc.CRC}, actual {crc}! The patch needs to be updated!");
+							// This task CANNOT be run at this moment, because PromptPanel.Instance is null!
+							// it will be ran when PromptPanel.Instance would become initialized later on.
+							yield return new Lazy<Task<HarmonyPatchInfo?>>(async () =>
+							{
+								var cancel = false;
+								await PromptPanel.Instance.AwaitShowPrompt(
+									@"Patch CRC validation failed!",
+									$"The target method `{originalMethod.DeclaringType.FullName}.{originalMethod.Name}` for patch `{declaringType.Name}.{declaringMethod.Name}` CRC validation failed:" +
+									$"expected {validateCrc.CRC}, actual {crc}!\r\nThe patch needs to be updated." +
+									"\r\n\r\nDo you wish to proceed with patching anyway (could result in incorrect mod behavior or break your save in worst case)?",
+									"Proceed",
+									() => cancel = false,
+									"Cancel",
+									() => cancel = true);
+								if (cancel)
+									return null;
+								return new HarmonyPatchInfo(
+									mod,
+									declaringType,
+									harmonyMethod,
+									harmonyPatchType,
+									prepareMethodInvocation,
+									cleanupMethodInvocation,
+									prepareUnpatchInvocation,
+									cleanupUnpatchInvocation);
+							});
+						}
+					}
+					yield return new HarmonyPatchInfo(
+						mod,
+						declaringType,
+						harmonyMethod,
+						harmonyPatchType,
+						prepareMethodInvocation,
+						cleanupMethodInvocation,
+						prepareUnpatchInvocation,
+						cleanupUnpatchInvocation)));
 				}
 			}
 		}
@@ -239,7 +299,7 @@ public class HarmonyPatchInfo
 		ConfigEntry = method.method.GetPatchConfigEntry() ?? declaringType.GetPatchConfigEntry();
 		OriginalMethod = GetOriginalMethod(declaringType, method);
 		Unpatchable = declaringType.GetCustomAttribute<UnpatchableAttribute>() != null || _patchKind is HarmonyPatchType.ReversePatch;
-		var unpatchMethodInfo = AccessTools.Method(declaringType, "Unpatch");
+		var unpatchMethodInfo = AccessTools.GetDeclaredMethods(declaringType).FirstOrDefault(x => x.Name == "Unpatch");
 		if (unpatchMethodInfo != null)
 		{
 			if (Unpatchable)
@@ -278,6 +338,12 @@ public class HarmonyPatchInfo
 					_patch = reversePatch.Patch(HarmonyReversePatchType.Original);
 				} else
 				{
+					HarmonyFileLog.Enabled = true;
+					var patchInfo = Harmony.GetPatchInfo(OriginalMethod);
+					if (patchInfo != null && patchInfo.Owners.Count > 0)
+					{
+						CommonMod.Instance.Logger.LogWarning($"Method {OriginalMethod.DeclaringType?.FullName}.{OriginalMethod.Name} already has patches applied, patching it again may cause unexpected behavior!");
+					}
 					_patch = harmony.Patch(OriginalMethod,
 						_patchKind == HarmonyPatchType.Prefix ? _harmonyMethod : null,
 						_patchKind == HarmonyPatchType.Postfix ? _harmonyMethod : null,
@@ -292,6 +358,7 @@ public class HarmonyPatchInfo
 			{
 				this.Category.Mod.Logger.LogError($"Error during patching {this.DeclaringType.FullName}.{this.DeclaringMethod.Name}");
 				this.Category.Mod.Logger.LogException(e);
+				HarmonyFileLog.Writer.Flush();
 				return false;
 			}
 		}
@@ -339,6 +406,7 @@ public class HarmonyPatchInfo
 			this.Category.Mod.Logger.LogError($"Error during unpatching {this.DeclaringType.FullName}.{this.DeclaringMethod.Name}");
 			this.Category.Mod.Logger.LogException(e);
 			Unpatchable = true;
+			HarmonyFileLog.Writer.Flush();
 			return false;
 		}
 	}

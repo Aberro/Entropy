@@ -14,6 +14,7 @@
 		<File Path="Stationeers.VS.User.props" />
 	</Folder>
 	<Folder Name="/Mods/">
+		<Project Path="Source/Entropy.Adiabatics/Entropy.Adiabatics.csproj" />
 		<Project Path="Source/Entropy.CodeEditor/Entropy.CodeEditor.csproj" Id="eaa17b6a-6f63-4871-93e8-c2a97f36a6cc">
 			<BuildType Solution="Publish|*" Project="Release" />
 		</Project>

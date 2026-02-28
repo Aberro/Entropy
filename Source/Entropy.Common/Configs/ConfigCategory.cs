@@ -38,7 +38,10 @@ public class ConfigCategory : IDisposable
 	/// A flag indicating if this is the default category. The default category is used when no category is specified in the <see cref="ConfigCategoryAttribute"/> or <see cref="ConfigCategoryDefinitionAttribute"/>.
 	/// </summary>
 	public bool IsDefault { get; private set; }
-
+	/// <summary>
+	/// Gets a value indicating whether the category is enabled.
+	/// </summary>
+	public bool IsEnabled { get; internal set; }
 	/// <summary>
 	/// The display name of the patch category, used to display the category name.
 	/// </summary>
@@ -85,6 +88,7 @@ public class ConfigCategory : IDisposable
 		IsDefault = name == DefaultCategoryName;
 		DisplayName = displayName;
 		Description = description;
+		Harmony.DEBUG = true;
 		_harmony = new Harmony($"{mod.Info.ModID}.{Name}");
 	}
 

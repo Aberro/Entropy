@@ -3,7 +3,7 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.Fixes")]
 [assembly: AssemblyCompany("Aberro")]
-[assembly: AssemblyVersion("1.0.0.360")]
+[assembly: AssemblyVersion("1.0.0.381")]
 [assembly: AssemblyDescription(@"
 [h1][color=#ffa500]Entropy.Fixes[/color][/h1][br]
 Contains various minor fixes or tweaks for Stationeers not covered by other mods.[br]
@@ -37,11 +37,11 @@ See: [url=https://github.com/StationeersLaunchPad/StationeersLaunchPad]Stationee
 [assembly: AssemblyMetadata(AssemblyMetadata.Tag, Tags.StationeersLaunchPad)]
 [assembly: AssemblyMetadata(AssemblyMetadata.DependsOn, "ModID=\"Entropy.Common\"")]
 [assembly: AssemblyMetadata(AssemblyMetadata.OrderAfter, "ModID=\"Entropy.Common\"")]
-// Last processed commit: 2a1eadd0d4edfe01b9371d6f2b9cb2b01af78459
-// Last processed version: 1.0.0.357
+// Last processed commit: c0edee4aea26a065630eb0965049bd7bd5ad80ac
+// Last processed version: 1.0.0.361
 [assembly: AssemblyMetadata(AssemblyMetadata.ChangeLog, @"
-	[h1]Update v1.0.0.343 to v1.0.0.357[/h1]
+	[h1]Update v1.0.0.357 to v1.0.0.361[/h1]
 	[list]
-		[*] Fixed SerializableDictionary, updated AssemblyInfo.cs to include uninstall process. Removed VerticalTabBar from ImGui - not planned for implementation, at least not yet and not in observable future. Fix for XmlSaveLoadLoadThingPrefix patch method - for some reason Thing might be repeated more than once, might've been an issue with deserialization, but either way it's better to overwrite than to ensure exclusivity.
+		[*] Minor corrections in AssemblyInfo.cs.
 	[/list]
 ")]

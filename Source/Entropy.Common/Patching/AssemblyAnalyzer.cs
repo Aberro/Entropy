@@ -1,4 +1,6 @@
-﻿using BepInEx.Configuration;
+﻿using Assets.Scripts.UI;
+using BepInEx.Configuration;
+using Cysharp.Threading.Tasks;
 using Entropy.Common.Attributes;
 using Entropy.Common.Configs;
 using Entropy.Common.Mods;
@@ -9,6 +11,7 @@ using MoonSharp.Interpreter.Interop.StandardDescriptors.HardwiredDescriptors;
 using Steamworks;
 using System.Diagnostics.CodeAnalysis;
 using System.EnterpriseServices;
+using System.Linq;
 using System.Reflection;
 using ConfigEntryBase = Entropy.Common.Configs.ConfigEntryBase;
 using SettingChangedEventArgs = Entropy.Common.Configs.SettingChangedEventArgs;
@@ -74,7 +77,10 @@ internal static class AssemblyAnalyzer
 			else
 				category = ConfigCategory.GetDefault(mod);
 			foreach (var patch in HarmonyPatchInfo.Create(mod, category.Harmony, type))
-				AddPatch(mod, patch);
+			{
+				if (patch != null)
+					AddPatch(mod, patch);
+			}
 			foreach(var method in type.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
 			{
 				AddPropertyHandlers(mod, method);
@@ -91,7 +97,7 @@ internal static class AssemblyAnalyzer
 	/// </remarks>
 	/// <param name="mod">The mod to configure.</param>
 	/// <param name="enabled">Flag indicating if the mod needs to be enabled or disabled.</param>
-	internal static void ConfigureMod(EntropyModBase mod, bool enabled)
+	internal static async void ConfigureMod(EntropyModBase mod, bool enabled)
 	{
 		if(!Patches.TryGetValue(mod, out var categories))
 			return;
@@ -115,6 +121,9 @@ internal static class AssemblyAnalyzer
 		}
 		if(!categoryPatches.Contains(patch))
 			categoryPatches.Add(patch);
+		// this should only be true if this patch was postponed.
+		if (patch.Category.IsEnabled)
+			patch.Patch(patch.Category.Harmony);
 	}
 
 	private static void OnConfigurationChanged(EntropyModBase mod, SettingChangedEventArgs e)
@@ -151,6 +160,7 @@ internal static class AssemblyAnalyzer
 		if(silent || !applied)
 			return;
 
+		category.IsEnabled = enabled;
 		if (enabled)
 		{
 			mod.Logger.LogInfo(category.IsDefault

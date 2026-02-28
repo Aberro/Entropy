@@ -6,6 +6,10 @@
 		<GenerateAbout>true</GenerateAbout>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Folder Include="Facades\System.Numerics\" />
+	  <Folder Include="Facades\System.Runtime.Intrinsics\" />
+	</ItemGroup>
 
 	<Target Name="SwitchToDebug" BeforeTargets="Build" Condition="Exists('$(UnityDirectory)Unity.exe')">
 		<Copy SourceFiles="$(UnityDirectory)Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_development_mono\WindowsPlayer.exe" DestinationFiles="$(StationeersDirectory)rocketstation.exe" SkipUnchangedFiles="false" />
