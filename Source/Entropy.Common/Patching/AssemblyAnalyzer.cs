@@ -107,7 +107,7 @@ internal static class AssemblyAnalyzer
 		mod.Logger.LogInfo(enabled ? $"`{mod.Info.Name}' mod enabled." : $"`{mod.Info.Name}' mod disabled.");
 	}
 
-	internal static void AddPatch(EntropyModBase mod, HarmonyPatchInfo patch)
+	internal static async void AddPatch(EntropyModBase mod, HarmonyPatchInfo patch)
 	{
 		if(!Patches.TryGetValue(mod, out var modPatches))
 		{
@@ -121,9 +121,6 @@ internal static class AssemblyAnalyzer
 		}
 		if(!categoryPatches.Contains(patch))
 			categoryPatches.Add(patch);
-		// this should only be true if this patch was postponed.
-		if (patch.Category.IsEnabled)
-			patch.Patch(patch.Category.Harmony);
 	}
 
 	private static void OnConfigurationChanged(EntropyModBase mod, SettingChangedEventArgs e)
@@ -134,7 +131,7 @@ internal static class AssemblyAnalyzer
 		}
 	}
 
-	private static void ConfigureCategory(EntropyModBase mod, ConfigCategory category, bool enabled, bool silent = false)
+	private static async void ConfigureCategory(EntropyModBase mod, ConfigCategory category, bool enabled, bool silent = false)
 	{
 		if(!Patches.TryGetValue(mod, out var categories))
 			return;
@@ -149,7 +146,7 @@ internal static class AssemblyAnalyzer
 			if (enabled)
 			{
 				if (patch.ConfigEntry?.Value ?? true)
-					applied |= patch.Patch(harmony);
+					applied |= await patch.Patch(harmony).ConfigureAwait(true);
 			} else
 			{
 				applied |= patch.Unpatch(harmony);
@@ -174,7 +171,7 @@ internal static class AssemblyAnalyzer
 		}
 	}
 
-	private static void ConfigurePatch(EntropyModBase mod, PatchConfigEntry entry, bool enabled, bool silent = false)
+	private static async void ConfigurePatch(EntropyModBase mod, PatchConfigEntry entry, bool enabled, bool silent = false)
 	{
 		if (!Patches.TryGetValue(mod, out var categories))
 			return;
@@ -186,7 +183,7 @@ internal static class AssemblyAnalyzer
 		var harmony = entry.Category.Harmony;
 		var applied = false;
 		if (enabled)
-			applied = patch.Patch(harmony);
+			applied = await patch.Patch(harmony).ConfigureAwait(true);
 		else
 			applied = patch.Unpatch(harmony);
 		

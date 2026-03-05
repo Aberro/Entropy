@@ -275,3 +275,5 @@ dotnet_diagnostic.CA1724.severity = none
 dotnet_diagnostic.CA1822.severity = suggestion
 # IDE0047: Remove unnecessary parentheses
 dotnet_diagnostic.IDE0047.severity = suggestion
+# CA2211: Non-constant fields should not be visible
+dotnet_diagnostic.CA2211.severity = suggestion

@@ -12,6 +12,7 @@ using LaunchPadBooster.Patching;
 using SimpleSpritePacker;
 using System.Collections;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using AccessTools = HarmonyLib.AccessTools;
 
@@ -26,6 +27,9 @@ public class HarmonyPatchInfo
 	private HarmonyPatchType _patchKind;
 	private MethodInfo? _patch;
 	private readonly Action? _unpatch;
+	private bool _invalid;
+	private uint _expectedCrc;
+	private uint _actualCrc;
 	/// <summary>
 	/// The category of the patch.
 	/// </summary>
@@ -226,39 +230,19 @@ public class HarmonyPatchInfo
 					}
 					var declaringMethod = harmonyMethod.method;
 					var validateCrc = declaringMethod.GetCustomAttribute<PatchValidateCrcAttribute>();
+					var invalid = false;
+					var expectedCrc = 0u;
+					var actualCrc = 0u;
 					if (validateCrc != null)
 					{
 						var originalMethod = GetOriginalMethod(declaringType, harmonyMethod);
 						var crc = Hash64.HashToUInt64(originalMethod.GetMethodBody().GetILAsByteArray());
+						expectedCrc = validateCrc.CRC;
+						actualCrc = crc;
 						if (validateCrc.CRC != crc)
 						{
 							CommonMod.Instance.Logger.LogError($"Target method `{originalMethod.DeclaringType.FullName}.{originalMethod.Name}` for patch {declaringType.Name}.{declaringMethod} CRC validation failed: expected {validateCrc.CRC}, actual {crc}! The patch needs to be updated!");
-							// This task CANNOT be run at this moment, because PromptPanel.Instance is null!
-							// it will be ran when PromptPanel.Instance would become initialized later on.
-							yield return new Lazy<Task<HarmonyPatchInfo?>>(async () =>
-							{
-								var cancel = false;
-								await PromptPanel.Instance.AwaitShowPrompt(
-									@"Patch CRC validation failed!",
-									$"The target method `{originalMethod.DeclaringType.FullName}.{originalMethod.Name}` for patch `{declaringType.Name}.{declaringMethod.Name}` CRC validation failed:" +
-									$"expected {validateCrc.CRC}, actual {crc}!\r\nThe patch needs to be updated." +
-									"\r\n\r\nDo you wish to proceed with patching anyway (could result in incorrect mod behavior or break your save in worst case)?",
-									"Proceed",
-									() => cancel = false,
-									"Cancel",
-									() => cancel = true);
-								if (cancel)
-									return null;
-								return new HarmonyPatchInfo(
-									mod,
-									declaringType,
-									harmonyMethod,
-									harmonyPatchType,
-									prepareMethodInvocation,
-									cleanupMethodInvocation,
-									prepareUnpatchInvocation,
-									cleanupUnpatchInvocation);
-							});
+							invalid = true;
 						}
 					}
 					yield return new HarmonyPatchInfo(
@@ -269,7 +253,12 @@ public class HarmonyPatchInfo
 						prepareMethodInvocation,
 						cleanupMethodInvocation,
 						prepareUnpatchInvocation,
-						cleanupUnpatchInvocation)));
+						cleanupUnpatchInvocation)
+					{
+						_invalid = invalid,
+						_expectedCrc = expectedCrc,
+						_actualCrc = actualCrc,
+					};
 				}
 			}
 		}
@@ -316,13 +305,29 @@ public class HarmonyPatchInfo
 	/// <param name="harmony">Harmony instance to use for patching.</param>
 	/// <returns><see langword="true"/> when the patch was applied successfully, otherwise <see langword="false"/>.</returns>
 	/// <exception cref="ArgumentNullException">Thrown when <paramref name="harmony"/> is null.</exception>
-	public bool Patch(Harmony harmony)
+	public async Task<bool> Patch(Harmony harmony)
 	{
 		if (harmony == null)
 			throw new ArgumentNullException(nameof(harmony));
 		// Check if the method is already patched.
 		var isPatched = Harmony.GetPatchInfo(OriginalMethod)?.Owners?.Any(harmony.Id.Equals) ?? false;
-
+		if(_invalid)
+		{
+			var cancel = false;
+			await UniTask.WaitUntil(() => PromptPanel.Instance != null);
+			await PromptPanel.Instance.AwaitShowPrompt(
+				@"Patch CRC validation failed!",
+				$"The target method `{OriginalMethod.DeclaringType.FullName}.{OriginalMethod.Name}` for patch `{DeclaringType.Name}.{DeclaringMethod.Name}` CRC validation failed:" +
+				$"expected 0x{_expectedCrc.ToString("X8", CultureInfo.InvariantCulture)}, actual 0x{_actualCrc.ToString("X8", CultureInfo.InvariantCulture)}!\r\nThe patch needs to be updated." +
+				"\r\n\r\nDo you wish to proceed with patching anyway (could result in incorrect mod behavior or break your save in worst case)?",
+				"Proceed",
+				() => cancel = false,
+				"Cancel",
+				() => cancel = true);
+			if (cancel)
+				return false;
+			_invalid = false;
+		}
 		if (!IsPatched)
 		{
 			try
@@ -358,7 +363,6 @@ public class HarmonyPatchInfo
 			{
 				this.Category.Mod.Logger.LogError($"Error during patching {this.DeclaringType.FullName}.{this.DeclaringMethod.Name}");
 				this.Category.Mod.Logger.LogException(e);
-				HarmonyFileLog.Writer.Flush();
 				return false;
 			}
 		}

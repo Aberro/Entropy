@@ -164,7 +164,13 @@ public abstract class ConfigEntryBase
 		Mod = mod;
 		Name = name;
 		Description = description;
-		Category = ConfigCategory.Get(mod, category) ?? throw new ApplicationException("Tried to use category '{category}' that is not defined! Use PatchCategoryDefinitionAttribute to define a category");
+		Category = ConfigCategory.Get(mod, category);
+		if(Category is null)
+		{
+			var message = $"Tried to use category '{category}' that is not defined! Use PatchCategoryDefinitionAttribute to define a category";
+			CommonMod.Instance.Logger.LogError(message);
+			throw new ApplicationException(message);
+		}
 		_onSettingChangedParameters = [this];
 	}
 

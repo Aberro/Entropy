@@ -5,7 +5,7 @@
 /// </summary>
 /// <param name="crc"></param>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-public class PatchValidateCrcAttribute(ulong crc) : Attribute 
+public class PatchValidateCrcAttribute(uint crc) : Attribute 
 {
-	public ulong CRC { get; } = crc;
+	public uint CRC { get; } = crc;
 }
