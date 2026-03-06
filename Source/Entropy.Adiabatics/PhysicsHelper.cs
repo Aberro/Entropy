@@ -1,9 +1,11 @@
 ﻿using Assets.Scripts;
 using Assets.Scripts.Atmospherics;
+using Assets.Scripts.Util;
 using Entropy.Common.Utils;
 using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using UnityEngine.UIElements;
 using static Assets.Scripts.Atmospherics.AtmosphereHelper;
 
 namespace Entropy.Adiabatics;
@@ -121,10 +123,12 @@ public static class PhysicsHelper
 		Debug.Assert(mixture.TotalEnergy < energyDebug);
 		return result;
 	}
-	public static void Add(this ref GasMixture mixture, ref GasMixture addMixture) =>
+	public static void Add(ref GasMixture mixture, ref GasMixture addMixture) =>
 		mixture.Add(addMixture);
-	public static void Remove(this ref GasMixture mixture, ref GasMixture removeMixture) =>
+	public static void Remove(ref GasMixture mixture, ref GasMixture removeMixture) =>
 		mixture.Remove(removeMixture);
+	public static GasMixture Remove(ref GasMixture mixture, MoleQuantity amount, MatterState matterState) =>
+		mixture.Remove(amount, matterState);
 	/// <summary>
 	/// Calculate the total joules of energy of all gases in a mixture.
 	/// </summary>
@@ -175,11 +179,12 @@ public static class PhysicsHelper
 	/// <param name="volume">The volume for which the pressure is calculated.</param>
 	/// <param name="temperature">The temperature for which the pressure is calculated.</param>
 	/// <returns>The pressure of given gas at given volume and temperature.</returns>
-	public static PressurekPa GetGasPressure(this ref GasMixture mixture, VolumeLitres volume, TemperatureKelvin temperature)
+	public static PressurekPa GetGasPressure(this ref GasMixture mixture, VolumeLitres volume)
 	{
-		Debug.Assert(volume > mixture.VolumeLiquids, "Volume must be greater than volume of liquids in the gas mixture.");
+		if (volume <= mixture.VolumeLiquids)
+			throw new ApplicationException("Volume must be greater than volume of liquids in the gas mixture.");
 		// P = nRT/V
-		return new PressurekPa(mixture.GetTotalMolesGasses, temperature, volume - mixture.VolumeLiquids);
+		return new PressurekPa(mixture.GetTotalMolesGasses, mixture.GetGasTemperature(), volume - mixture.VolumeLiquids);
 	}
 
 	/// <summary>
@@ -197,7 +202,7 @@ public static class PhysicsHelper
 		var heatCapacityRatio = mixture.GetGasHeatCapacityRatio(); // γ
 																   // Liquids are incompressible, so we need to subtract their volume from the initial volume.
 		initialVolume -= mixture.VolumeLiquids;
-		var initialPressure = GetGasPressure(ref mixture, initialVolume, mixture.GetGasTemperature());
+		var initialPressure = GetGasPressure(ref mixture, initialVolume);
 		// V_final = V_initial * (P_initial / P_final)^(1/γ)
 		var result = (initialVolume * (double) Math.Pow((initialPressure / targetPressure).ToDouble(), 1.0 / heatCapacityRatio)) + mixture.VolumeLiquids; // add back the subtracted volume of liquids.
 		Debug.Assert(result.ToDouble() > 0);
@@ -222,7 +227,7 @@ public static class PhysicsHelper
 		if (gasHeatCapacity.IsDenormalToNegative())
 			return PressurekPa.Zero;
 		var heatCapacityRatio = mixture.GetGasHeatCapacityRatio(); // γ
-		var initialPressure = GetGasPressure(ref mixture, initialVolume, mixture.GetGasTemperature());
+		var initialPressure = GetGasPressure(ref mixture, initialVolume);
 		// P_final = P_initial * (V_initial / V_final)^γ
 		return initialPressure * Math.Pow((initialVolume / finalVolume).ToDouble(), heatCapacityRatio);
 	}
@@ -244,7 +249,7 @@ public static class PhysicsHelper
 		var gasHeatCapacity = mixture.GetGasHeatCapacity();
 		if (gasHeatCapacity.IsDenormalToNegative())
 			return MoleEnergy.Zero;
-		var P1 = mixture.GetGasPressure(initialVolume, mixture.Temperature).ToDouble();
+		var P1 = mixture.GetGasPressure(initialVolume).ToDouble();
 		var V1 = initialVolume.ToDouble();
 		var V2 = finalVolume.ToDouble();
 		var γ = mixture.GetGasHeatCapacityRatio();
@@ -258,14 +263,15 @@ public static class PhysicsHelper
 		var W = workDone.ToDouble();
 		var γ = mixture.GetGasHeatCapacityRatio();
 		var V1 = initialVolume.ToDouble();
-		var P1 = mixture.GetGasPressure(initialVolume, mixture.Temperature).ToDouble();
+		var P1 = mixture.GetGasPressure(initialVolume).ToDouble();
 		var ΔV = V1 * ((1 / Math.Pow((W * (1 - γ) / (P1 * V1)) + 1, 1 / (γ - 1))) - 1);
 		return new VolumeLitres(ΔV);
 	}
 
 	public static GasMixture Split(this ref GasMixture gas, double fraction, MatterState matterState = MatterState.All)
 	{
-		Debug.Assert(fraction >= 0.0f && fraction <= 1.0f, "Fraction must be in range [0, 1].");
+		if (fraction < 0.0f || fraction > 1.0f)
+			throw new ArgumentOutOfRangeException(nameof(fraction), "Fraction must be in range [0, 1].");
 		var result = gas;
 		gas.Scale(1 - fraction, matterState);
 		result.Scale(fraction, matterState);
@@ -363,13 +369,14 @@ public static class PhysicsHelper
 
 		pumpedGas.Scale((pumpVolume / (inputVolume + pumpVolume)).ToDouble(), matterState); // ... and scale down to ratio of volumes.
 		intake.Remove(pumpedGas); // Remove the gas in the cylinder from the intake atmosphere.
+		AddEnergy(ref pumpedGas, RemoveEnergy(ref intake, FlowWork(pumpedGas.GetTotalMolesGasses, intake.Temperature)));
 
 		var transitionVolume = pumpVolume;
 		// Check if there's any gas in the exhaust.
 		if (exhaust.GetTotalMolesGasses > Chemistry.MINIMUM_QUANTITY_MOLES)
 		{
 			// If there is - equalize the pressure in the cylinder and exhaust by choosing the volume at which the pressure is the same.
-			transitionVolume = pumpedGas.GetAdiabaticVolumeForTargetPressure(pumpVolume, exhaust.GetGasPressure(outputVolume, exhaust.GetGasTemperature()));
+			transitionVolume = pumpedGas.GetAdiabaticVolumeForTargetPressure(pumpVolume, exhaust.GetGasPressure(outputVolume));
 		}
 		var compressionWork = MoleEnergy.Zero;
 		// If the volume of the gas in the cylinder is less than the volume of the pump, the gas will be compressed.
@@ -384,7 +391,7 @@ public static class PhysicsHelper
 		{
 			// The exhaust pressure can't be reached, the pump efficiency is zero, just return the pumped gas back into intake
 			intake.AddEnergy(-firstPhaseWork);
-			intake.Add(ref pumpedGas);
+			Add(ref intake, ref pumpedGas);
 			//intake.AddEnergy(firstPhaseWork); // return work done by intake gas back
 			// and add waste power to both sides
 			//intake.AddEnergy(powerLimit * 0.5);
@@ -409,7 +416,7 @@ public static class PhysicsHelper
 
 		// First do a simulation to get the power of this step
 		var exhaustCopy = exhaust;
-		exhaustCopy.Add(ref pumpedGas); // Open the exhaust and mix the gas from the cylinder with the gas in the exhaust.
+		Add(ref exhaustCopy, ref pumpedGas); // Open the exhaust and mix the gas from the cylinder with the gas in the exhaust.
 		var secondPhaseWork = exhaustCopy.GetAdiabaticProcessWorkDone(outputVolume + PhysicsMath.Min(pumpVolume, transitionVolume), outputVolume);
 		if (secondPhaseWork > powerLimitRecuperative)
 		{
@@ -420,9 +427,9 @@ public static class PhysicsHelper
 			pumpedGas.AddEnergy(-compressionWork);
 			//pumpedGas.AddEnergy(powerLimit);
 			var slippedGas = pumpedGas.Split(1 - gasRatio);
-			exhaust.Add(ref pumpedGas); // Add the gas we can push to the exhaust.
+			Add(ref exhaust, ref pumpedGas); // Add the gas we can push to the exhaust.
 			exhaust.AddEnergy(powerLimit);
-			intake.Add(ref slippedGas);
+			Add(ref intake, ref slippedGas);
 			Debug.Assert((intake.TotalEnergy - exhaust.TotalEnergy - totalEnergy) <= powerLimit);
 			currentTotalEnergyDifference = ((totalEnergy + powerLimit) - (intake.TotalEnergy + exhaust.TotalEnergy)).ToDouble();
 			Debug.Assert(Math.Abs(currentTotalEnergyDifference) < ((totalEnergy + powerLimit).ToDouble() / 100000));
@@ -431,7 +438,7 @@ public static class PhysicsHelper
 			// Now add energy
 		}
 		// Now repeat on actual gas arguments
-		exhaust.Add(ref pumpedGas);
+		Add(ref exhaust, ref pumpedGas);
 		//Debug.Assert(secondPhaseWork >= 0.0f, "Work done by the gas during adiabatic compression must be zero or positive.");
 		exhaust.AddEnergy(secondPhaseWork);
 		if (firstPhaseWork + compressionWork + secondPhaseWork < MoleEnergy.Zero)
@@ -449,6 +456,8 @@ public static class PhysicsHelper
 		currentTotalEnergyDifference = ((totalEnergy + firstPhaseWork + compressionWork + secondPhaseWork) - (intake.TotalEnergy + exhaust.TotalEnergy)).ToDouble();
 		Debug.Assert(Math.Abs(currentTotalEnergyDifference) < ((totalEnergy + powerLimit).ToDouble() / 100000));
 		Debug.Assert(Math.Abs(totalQuantity - intake.GetQuantity - exhaust.GetQuantity) < totalQuantity / 1000000);
+		Debug.Assert(intake.VolumeLiquids < inputVolume);
+		Debug.Assert(exhaust.VolumeLiquids < outputVolume);
 		return firstPhaseWork + compressionWork + secondPhaseWork;
 	}
 
@@ -525,10 +534,10 @@ public static class PhysicsHelper
 		var exhaustCopy = exhaust;
 		var power = DoAdiabaticPumping(ref intakeCopy, ref exhaustCopy, matterState, out var pumpedGasSimulated, inputVolume, outputVolume, pumpVolume, powerLimit, geared);
 		var pressureScaling = 1.0;
-		var intakePressure = intake.GetGasPressure(inputVolume, intake.Temperature);
-		var exhaustPressure = exhaust.GetGasPressure(outputVolume, exhaust.Temperature);
-		var resultingIntakePressure = intakeCopy.GetGasPressure(inputVolume, intakeCopy.Temperature);
-		var resultingExhaustPressure = exhaustCopy.GetGasPressure(outputVolume, exhaustCopy.Temperature);
+		var intakePressure = intake.GetGasPressure(inputVolume);
+		var exhaustPressure = exhaust.GetGasPressure(outputVolume);
+		var resultingIntakePressure = intakeCopy.GetGasPressure(inputVolume);
+		var resultingExhaustPressure = exhaustCopy.GetGasPressure(outputVolume);
 		if (resultingIntakePressure < inputMinPressure)
 		{
 			var targetPressureDifference = intakePressure - inputMinPressure;
@@ -626,9 +635,103 @@ public static class PhysicsHelper
 				geared,
 				inputMinPressure,
 				outputMaxPressure);
-			pumpedGas.Add(pumpedGasIteration);
+			Add(ref pumpedGas, ref pumpedGasIteration);
 		}
 		return powerSum / iterations;
+	}
+	public static MoleEnergy DoAdiabaticPumpingIterative(
+		Atmosphere intake,
+		Atmosphere exhaust,
+		MatterState matterState,
+		VolumeLitres pumpVolume,
+		MoleEnergy powerLimit,
+		bool geared,
+		int iterations = 10)
+	{
+		if (intake is null || exhaust is null)
+			return MoleEnergy.Zero;
+		return DoAdiabaticPumpingIterative(
+			ref intake.GasMixture,
+			ref exhaust.GasMixture,
+			matterState,
+			out var _,
+			intake.Volume,
+			exhaust.Volume,
+			pumpVolume,
+			powerLimit,
+			geared,
+			iterations);
+	}
+	public static MoleEnergy DoAdiabaticPumpingIterative(
+		Atmosphere intake,
+		Atmosphere exhaust,
+		MatterState matterState,
+		out GasMixture pumpedGas,
+		VolumeLitres pumpVolume,
+		MoleEnergy powerLimit,
+		bool geared,
+		int iterations = 10)
+	{
+		pumpedGas = GasMixtureHelper.Invalid;
+		if (intake is null || exhaust is null)
+			return MoleEnergy.Zero;
+		return DoAdiabaticPumpingIterative(ref intake.GasMixture, ref exhaust.GasMixture, matterState, out pumpedGas, intake.Volume, exhaust.Volume, pumpVolume, powerLimit, geared, iterations);
+	}
+	public static MoleEnergy DoAdiabaticPumpingIterative(
+		Atmosphere intake,
+		Atmosphere exhaust,
+		MatterState matterState,
+		VolumeLitres pumpVolume,
+		MoleEnergy powerLimit,
+		bool geared,
+		PressurekPa inputMinPressure,
+		PressurekPa outputMaxPressure,
+		int iterations = 10)
+	{
+		if (intake is null || exhaust is null)
+			return MoleEnergy.Zero;
+		return DoAdiabaticPumpingIterative(
+			ref intake.GasMixture,
+			ref exhaust.GasMixture,
+			matterState,
+			out var _,
+			intake.Volume,
+			exhaust.Volume,
+			pumpVolume,
+			powerLimit,
+			geared,
+			inputMinPressure,
+			outputMaxPressure,
+			iterations);
+	}
+	public static MoleEnergy DoAdiabaticPumpingIterative(
+		Atmosphere intake,
+		Atmosphere exhaust,
+		MatterState matterState,
+		out GasMixture pumpedGas,
+		VolumeLitres pumpVolume,
+		MoleEnergy powerLimit,
+		bool geared,
+		PressurekPa inputMinPressure,
+		PressurekPa outputMaxPressure,
+		int iterations = 10)
+	{
+		pumpedGas = GasMixtureHelper.Invalid;
+		if (intake is null || exhaust is null)
+			return MoleEnergy.Zero;
+		return DoAdiabaticPumpingIterative(
+			ref intake.GasMixture,
+			ref exhaust.GasMixture,
+			matterState,
+			out pumpedGas,
+			intake.Volume,
+			exhaust.Volume,
+			pumpVolume,
+			powerLimit,
+			geared,
+			inputMinPressure,
+			outputMaxPressure,
+			iterations);
 	}
 
 	public static readonly double DischargeCoefficient = 0.61f;
@@ -643,15 +746,13 @@ public static class PhysicsHelper
 	/// <returns></returns>
 	public static MoleQuantity GetMatterFlowRateThroughOrifice(ref GasMixture lowPressureSide, ref GasMixture highPressureSide, double orificeArea, VolumeLitres lowPressureVolume, VolumeLitres highPressureVolume)
 	{
-		var lowPTemperature = lowPressureSide.GetGasTemperature();
-		var highPTemperature = highPressureSide.GetGasTemperature();
 		// we use high pressure heat capacity ratio because it will be the source of moving gas,
 		// so we consider that diffusion of gas from low pressure side would be negligible.
 		// That is true at least for when critical pressure ratio is important.
 		var heatCapacityRatio = highPressureSide.GetGasHeatCapacityRatio();
 		var criticalRatio = Math.Pow(2 / (heatCapacityRatio + 1), heatCapacityRatio / (heatCapacityRatio - 1));
-		var lowPressure = lowPressureSide.GetGasPressure(lowPressureVolume, lowPTemperature).ToDouble() * 1000; // convert to Pa
-		var highPressure = highPressureSide.GetGasPressure(highPressureVolume, highPTemperature).ToDouble() * 1000;
+		var lowPressure = lowPressureSide.GetGasPressure(lowPressureVolume).ToDouble() * 1000; // convert to Pa
+		var highPressure = highPressureSide.GetGasPressure(highPressureVolume).ToDouble() * 1000;
 		var pressureRatio = lowPressure / highPressure;
 		Debug.Assert(highPressure > lowPressure, $"{nameof(highPressureSide)} should have higher pressure that {nameof(lowPressureSide)}!");
 		double massFlowRate;
@@ -672,63 +773,78 @@ public static class PhysicsHelper
 		return new MoleQuantity(massFlowRate / highPressureSide.GetAverageGasMolarMass());
 	}
 	public static void Mix(
-		ref GasMixture left,
-		ref GasMixture right,
-		VolumeLitres leftVolume,
-		VolumeLitres rightVolume,
+		Atmosphere left,
+		Atmosphere right,
 		VolumeLitres mixingVolume,
 		MatterState leftMatterState,
 		MatterState rightMatterState)
 	{
-		leftVolume -= leftMatterState is MatterState.Gas ? left.VolumeLiquids : VolumeLitres.Zero;
-		rightVolume -= rightMatterState is MatterState.Gas ? right.VolumeLiquids : VolumeLitres.Zero;
-		var leftPressure = left.GetGasPressure(leftVolume, left.Temperature);
-		var rightPressure = right.GetGasPressure(rightVolume, right.Temperature);
-		var totalPressure = leftPressure + rightPressure;
-
-		if (totalPressure <= PressurekPa.Zero)
-			return;
-
-		var leftPressureRatio = (leftPressure / totalPressure).ToDouble();
-		var rightPressureRatio = 1.0 - leftPressureRatio;
-
-		// Each side claims a share of the mixing volume proportional to its pressure
-		var leftMixVolume = mixingVolume * leftPressureRatio;
-		var rightMixVolume = mixingVolume * rightPressureRatio;
-
-		// Fraction of each side's gas that expands into its share of the mixing volume
-		var leftMixFraction = (leftMixVolume / (leftVolume + leftMixVolume)).ToDouble();
-		var rightMixFraction = (rightMixVolume / (rightVolume + rightMixVolume)).ToDouble();
-
-		// Combine contributions from each side into the one mixture
-		var mix = left.Split(leftMixFraction, leftMatterState);
-		// Remember quantities each side contributing.
-		var leftSideMatter = mix.GetQuantity;
-		mix.Add(right.Split(rightMixFraction, rightMatterState));
-		var rightSideMatter = mix.GetQuantity - leftSideMatter;
-
-		// Divide mixed gas back to each side proportionally to original pressure
-		left.Add(mix.Split(leftPressureRatio));
-		right.Add(mix);
-
-		var totalMatter = leftSideMatter + rightSideMatter;
-		var leftMatterFlow = (totalMatter * leftPressureRatio) - leftSideMatter;
-		var rightMatterFlow = (totalMatter * rightPressureRatio) - rightSideMatter;
-		left.AddEnergy(FlowWork(new MoleQuantity(leftMatterFlow), left.Temperature));
-		right.AddEnergy(FlowWork(new MoleQuantity(rightMatterFlow), right.Temperature));
-	}
-	public static void Mix(Atmosphere? left, Atmosphere? right, VolumeLitres mixingVolume, MatterState matterState = MatterState.All)
-	{
-		if(left is null || right is null)
-			return;
-		Mix(ref left.GasMixture, ref right.GasMixture, left.Volume, right.Volume, mixingVolume, matterState, matterState);
-	}
-	public static void Mix(Atmosphere? left, Atmosphere? right, VolumeLitres mixingVolume, MatterState leftMatterState, MatterState rightMatterState)
-	{
 		if (left is null || right is null)
 			return;
-		Mix(ref left.GasMixture, ref right.GasMixture, left.Volume, right.Volume, mixingVolume, leftMatterState, rightMatterState);
+		if (left.Volume <= VolumeLitres.Zero || right.Volume <= VolumeLitres.Zero)
+			return;
+		GasMixture mix;
+		if(left.TotalVolumeLiquids >= left.Volume || right.TotalVolumeLiquids >= right.Volume)
+		{
+			var totalVolumeLiquids = left.TotalVolumeLiquids + right.TotalVolumeLiquids;
+			var leftRatio = leftMatterState is MatterState.Gas ? 0d : rightMatterState is MatterState.Gas ? 1 : (left.TotalVolumeLiquids / totalVolumeLiquids).ToDouble();
+			var rightRatio = 1 - leftRatio;
+			
+			mix = Split(ref left.GasMixture, leftRatio, MatterState.Liquid);
+			mix.Add(Split(ref right.GasMixture, rightRatio, MatterState.Liquid));
+			left.Add(mix.Split(0.5));
+			right.Add(mix);
+		}
+
+		var source = left;
+		var receiver = right;
+		var matterState = leftMatterState;
+
+		if (left.PressureGassesAndLiquids < right.PressureGassesAndLiquids)
+		{
+			source = right;
+			receiver = left;
+			matterState = rightMatterState;
+		}
+
+		// First mix atmospheres
+		var mixVolumeLimited = RocketMath.Min(source.GetVolume(matterState), RocketMath.Min(receiver.GetVolume(matterState), mixingVolume));
+		var leftAmount = IdealGas.Quantity(left.PressureGassesAndLiquids, mixVolumeLimited / 2, left.Temperature);
+		var rightAmount = IdealGas.Quantity(right.PressureGassesAndLiquids, mixVolumeLimited / 2, right.Temperature);
+		mix = left.Remove(leftAmount, leftMatterState);
+		mix.Add(right.Remove(rightAmount, rightMatterState));
+		left.Add(Remove(ref mix, leftAmount, MatterState.All));
+		right.Add(mix);
+
+		// Then equalize them.
+		//var pressureDifference = (source.PressureGassesAndLiquids - receiver.PressureGassesAndLiquids) * 0.8; // reduce equalization, to make it more smooth
+		//if (pressureDifference <= PressurekPa.Zero)
+		//	return;
+		//mixVolumeLimited = RocketMath.Min(source.GetVolume(matterState), RocketMath.Min(receiver.GetVolume(matterState), mixingVolume));
+		//var moveAmount = IdealGas.Quantity(pressureDifference, mixVolumeLimited, source.Temperature);
+		//var movedGas = source.Remove(moveAmount, matterState);
+		//receiver.Add(movedGas);
+		//var equilibriumPressure = source.PressureGassesAndLiquids;
+		//AddEnergy(ref receiver.GasMixture, RemoveEnergy(ref source.GasMixture, FlowWork(moveAmount, source.Temperature)));
+		var pressureDifference = (source.PressureGassesAndLiquids - receiver.PressureGassesAndLiquids) * 0.8; // reduce equalization, to make it more smooth
+		if (pressureDifference <= PressurekPa.Zero)
+			return;
+		var γ = source.GasMixture.GetGasHeatCapacityRatio();
+		var Vs = source.GetVolume(matterState);
+		var Vr = receiver.GetVolume(matterState);
+		// Harmonic combination of volumes: Vs·Vr/(Vs+Vr), limited by physical mixing volume.
+		var effectiveVolume = RocketMath.Min(Vs * (Vr / (Vs + Vr)).ToDouble(), mixingVolume);
+		// δn = ΔP·V_eff / (γ·R·Ts) — dividing by γ accounts for the flow work heating/cooling.
+		var moveAmount = IdealGas.Quantity(pressureDifference * (1.0 / γ), effectiveVolume, source.Temperature);
+		var movedGas = source.Remove(moveAmount, matterState);
+		receiver.Add(movedGas);
+		AddEnergy(ref receiver.GasMixture, RemoveEnergy(ref source.GasMixture, FlowWork(moveAmount, source.Temperature)));
+
+		Debug.Assert(left.TotalVolumeLiquids < left.Volume);
+		Debug.Assert(right.TotalVolumeLiquids < right.Volume);
 	}
+	public static void Mix(Atmosphere? left, Atmosphere? right, VolumeLitres mixingVolume, MatterState matterState = MatterState.All) =>
+		Mix(left!, right!, mixingVolume, matterState, matterState);
 	public static MoleEnergy FlowWork(this MoleQuantity flowQuantity, TemperatureKelvin temperature) =>
 		new(flowQuantity.ToDouble() * R * temperature.ToDouble());
 

@@ -2,6 +2,7 @@
 using Assets.Scripts.Atmospherics;
 using Assets.Scripts.GridSystem;
 using Assets.Scripts.Objects;
+using Assets.Scripts.Objects.Electrical;
 using Assets.Scripts.Objects.Items;
 using Assets.Scripts.Objects.Pipes;
 using Assets.Scripts.Util;
@@ -108,12 +109,9 @@ public static class Patches
 					if (@this.WorldAtmosphere == null)
 						@this.WorldAtmosphere = @this.GridController.AtmosphericsController.CloneGlobalAtmosphere(@this.WorldGrid);
 					@this.UsedPower += Math.Max(0, DoAdiabaticPumpingIterative(
-						ref @this.InternalAtmosphere.GasMixture,
-						ref @this.WorldAtmosphere.GasMixture,
+						@this.InternalAtmosphere,
+						@this.WorldAtmosphere,
 						MatterState.Gas,
-						out var _,
-						@this.InternalAtmosphere.Volume,
-						@this.WorldAtmosphere.Volume,
 						new VolumeLitres(PumpVolume),
 						new MoleEnergy(PumpPower * @this.PowerEfficiency),
 						Geared,
@@ -130,12 +128,10 @@ public static class Patches
 					{
 						// Not sure... Is pumping from and to the same atmosphere fine?
 						@this.UsedPower += Math.Max(0, DoAdiabaticPumpingIterative(
-							ref @this.WorldAtmosphere.GasMixture,
-							ref @this.WorldAtmosphere.GasMixture,
+							@this.WorldAtmosphere,
+							@this.WorldAtmosphere,
 							MatterState.Gas,
 							out pumpedGas,
-							@this.WorldAtmosphere.Volume,
-							@this.WorldAtmosphere.Volume,
 							new VolumeLitres(PumpVolume),
 							new MoleEnergy(PumpPower * @this.PowerEfficiency),
 							Geared,
@@ -189,24 +185,18 @@ public static class Patches
 			@this.UsedPower = 5;
 			if(@this.InputNetwork != null)
 				@this.UsedPower += Math.Max(0, DoAdiabaticPumpingIterative(
-					ref @this.InputNetwork.Atmosphere.GasMixture,
-					ref @this.InternalAtmosphere.GasMixture,
+					@this.InputNetwork.Atmosphere,
+					@this.InternalAtmosphere,
 					MatterState.All,
-					out var _,
-					@this.InputNetwork.Atmosphere.Volume,
-					@this.InternalAtmosphere.Volume,
 					new VolumeLitres(PumpVolume),
 					new MoleEnergy(PumpPower * (@this.OutputSetting2 / @this.MaxSetting2)) * Efficiency,
 					Geared,
 					Iterations).ToFloat()) / Efficiency;
 			if(@this.OutputNetwork != null)
 				@this.UsedPower += Math.Max(0, DoAdiabaticPumpingIterative(
-					ref @this.InternalAtmosphere.GasMixture,
-					ref @this.OutputNetwork.Atmosphere.GasMixture,
+					@this.InternalAtmosphere,
+					@this.OutputNetwork.Atmosphere,
 					MatterState.Gas,
-					out var _,
-					@this.InternalAtmosphere.Volume,
-					@this.OutputNetwork.Atmosphere.Volume,
 					new VolumeLitres(PumpVolume),
 					new MoleEnergy(PumpPower * (@this.OutputSetting / @this.MaxSetting)) * Efficiency,
 					Geared,
@@ -263,12 +253,9 @@ public static class Patches
 			if(@this.InputNetwork != null)
 			{
 				@this.UsedPower = 5 + Math.Max(0, DoAdiabaticPumpingIterative(
-					ref @this.InputNetwork.Atmosphere.GasMixture,
-					ref @this.InternalAtmosphere.GasMixture,
+					@this.InputNetwork.Atmosphere,
+					@this.InternalAtmosphere,
 					MatterState.All,
-					out var _,
-					@this.InputNetwork.Atmosphere.Volume,
-					@this.InternalAtmosphere.Volume,
 					new VolumeLitres(PumpVolume),
 					new MoleEnergy(PumpPower * (@this.OutputSetting / @this.MaxSetting)) * Efficiency,
 					Geared,
@@ -333,12 +320,9 @@ public static class Patches
 				return false;
 
 			DoAdiabaticPumpingIterative(
-				ref input1.GasMixture,
-				ref internalAtmosphere.GasMixture,
+				input1,
+				internalAtmosphere,
 				MatterState.All,
-				out var _,
-				input1.Volume,
-				internalAtmosphere.Volume,
 				new VolumeLitres(PumpVolume * (@this.OutputSetting / @this.MaxSetting)),
 				new MoleEnergy(PumpPower * Efficiency),
 				Geared,
@@ -383,12 +367,9 @@ public static class Patches
 				break;
 			case MatterState.Gas:
 				@this.UsedPower = 5 + Math.Max(0, DoAdiabaticPumpingIterative(
-					ref inputAtmos.GasMixture,
-					ref outputAtmos.GasMixture,
+					inputAtmos,
+					outputAtmos,
 					MatterState.Gas,
-					out var _,
-					inputAtmos.Volume,
-					outputAtmos.Volume,
 					new VolumeLitres(PumpVolume),
 					new MoleEnergy(PumpPower * (@this.OutputSetting / @this.MaxSetting)) * Efficiency,
 					Geared,
@@ -444,12 +425,9 @@ public static class Patches
 					break;
 				case MatterState.Gas:
 					@this.UsedPower = 5 + Math.Max(0, DoAdiabaticPumpingIterative(
-						ref inputAtmos.GasMixture,
-						ref outputAtmos.GasMixture,
+						inputAtmos,
+						outputAtmos,
 						MatterState.Gas,
-						out var _,
-						inputAtmos.Volume,
-						outputAtmos.Volume,
 						new VolumeLitres(PumpVolume),
 						new MoleEnergy(PumpPower * Efficiency),
 						Geared,
@@ -506,12 +484,9 @@ public static class Patches
 				if(@this is TurboVolumePump)
 				{
 					@this.UsedPower = 5 + Math.Max(0, DoAdiabaticPumpingIterative(
-					ref inputAtmosphere.GasMixture,
-					ref outputAtmosphere.GasMixture,
+					inputAtmosphere,
+					outputAtmosphere,
 					MatterState.All,
-					out var _,
-					inputAtmosphere.Volume,
-					outputAtmosphere.Volume,
 					new VolumeLitres(TurboPumpVolume),
 					new MoleEnergy(TurboPumpPower * TurboPumpEfficiency),
 					TurboPumpGeared,
@@ -520,12 +495,9 @@ public static class Patches
 				else
 				{
 					@this.UsedPower = 5 + Math.Max(0, DoAdiabaticPumpingIterative(
-					ref inputAtmosphere.GasMixture,
-					ref outputAtmosphere.GasMixture,
+					inputAtmosphere,
+					outputAtmosphere,
 					MatterState.All,
-					out var _,
-					inputAtmosphere.Volume,
-					outputAtmosphere.Volume,
 					new VolumeLitres(VolumePumpVolume),
 					new MoleEnergy(VolumePumpPower * VolumePumpEfficiency),
 					VolumePumpGeared,
@@ -566,20 +538,33 @@ public static class Patches
 			{
 				var worldAtmosphere = traverse.Property<AtmosphericsController>("AtmosphericsController").Value.CloneGlobalAtmosphere(@this.WorldGrid);
 				var atmosphere = @this.ConnectedPipeNetwork.Atmosphere;
+				//var pressureExternal = worldAtmosphere.PressureGassesAndLiquids;
+				//var temperatureExternal = worldAtmosphere.Temperature;
+				//var pressureInternal = atmosphere.PressureGassesAndLiquids;
+				//var temperatureInternal = atmosphere.Temperature;
 				var pumpedGas = GasMixtureHelper.Invalid;
 				var intake = @this.VentDirection is VentDirection.Outward ? atmosphere : (@this.VentDirection is VentDirection.Inward ? worldAtmosphere : null);
 				var exhaust = @this.VentDirection is VentDirection.Outward ? worldAtmosphere : (@this.VentDirection is VentDirection.Inward ? atmosphere : null);
-				var minPressure = @this.VentDirection is VentDirection.Outward ? @this.InternalPressure : (@this.VentDirection is VentDirection.Inward ? @this.ExternalPressure : PressurekPa.Zero);
-				var maxPressure = @this.VentDirection is VentDirection.Outward ? @this.ExternalPressure : (@this.VentDirection is VentDirection.Inward ? @this.InternalPressure : PressurekPa.MaxValue);
+
+				var minPressure = PressurekPa.Zero;
+				var maxPressure = PressurekPa.MaxValue;
+				if (@this.VentDirection is VentDirection.Outward)
+				{
+					minPressure = @this.InternalPressure;
+					maxPressure = @this.ExternalPressure;
+				}
+				else if (@this.VentDirection is VentDirection.Inward)
+				{
+					minPressure = @this.ExternalPressure;
+					maxPressure = @this.InternalPressure;
+				}
 
 				if (intake is not null && exhaust is not null)
 					@this.UsedPower = 5 + Math.Max(0, DoAdiabaticPumpingIterative(
-						ref intake.GasMixture,
-						ref exhaust.GasMixture,
+						intake,
+						exhaust,
 						MatterState.All,
 						out pumpedGas,
-						intake.Volume,
-						exhaust.Volume,
 						new VolumeLitres(PumpVolume),
 						new MoleEnergy(PumpPower * Efficiency),
 						Geared,
@@ -588,12 +573,15 @@ public static class Patches
 						Iterations).ToFloat() / Efficiency);
 				else
 					@this.UsedPower = 5;
-				var pressure = PhysicsHelper.GetGasPressure(ref pumpedGas, new VolumeLitres(PumpVolume), pumpedGas.Temperature);
+				var pressure = PhysicsHelper.GetGasPressure(ref pumpedGas, new VolumeLitres(PumpVolume));
 				@this.FlowIndicatorStatus = pressure.ToDouble() > 10
 					? FlowIndicatorState.Max
 					: (pressure.ToDouble() > 1
 						? (@this.VentDirection is VentDirection.Inward ? FlowIndicatorState.InwardsLimited : FlowIndicatorState.OutwardsLimited)
 						: (@this.VentDirection is VentDirection.Inward ? FlowIndicatorState.InwardsVeryLimited : FlowIndicatorState.OutwardsVeryLimited));
+				//AdiabaticsMod.Instance.Logger.LogDebug($"ActiveVent{GameManager.GameTickCount}.\n" +
+				//	$"Before: External {pressureExternal.ToDouble()}kPa, {temperatureExternal.ToDouble()}K, Internal {pressureInternal.ToDouble()}kPa, {temperatureInternal.ToDouble()}K\n" +
+				//	$"After: External {worldAtmosphere.PressureGassesAndLiquids.ToDouble()}kPa, {worldAtmosphere.Temperature.ToDouble()}K, Internal {atmosphere.PressureGassesAndLiquids.ToDouble()}kPa, {atmosphere.Temperature.ToDouble()}K");
 			}
 			else
 				@this.FlowIndicatorStatus = FlowIndicatorState.None;
@@ -654,12 +642,10 @@ public static class Patches
 				var maxPressure = @this.VentDirection is VentDirection.Outward ? @this.ExternalPressure : (@this.VentDirection is VentDirection.Inward ? @this.InternalPressure : PressurekPa.MaxValue);
 				if (intake is not null && exhaust is not null)
 					@this.UsedPower = 5 + Math.Max(0, DoAdiabaticPumpingIterative(
-						ref atmosphere.GasMixture,
-						ref worldAtmosphere.GasMixture,
+						atmosphere,
+						worldAtmosphere,
 						MatterState.All,
 						out pumpedGas,
-						atmosphere.Volume,
-						worldAtmosphere.Volume,
 						new VolumeLitres(@this is PoweredVentSingleGrid ? PumpVolume : LargePumpVolume),
 						new MoleEnergy(@this is PoweredVentSingleGrid ? PumpPower * Efficiency : LargePumpPower * LargeEfficiency),
 						Geared,
@@ -668,13 +654,90 @@ public static class Patches
 						@this is PoweredVentSingleGrid ? Iterations : LargeIterations).ToFloat() / (@this is PoweredVentSingleGrid ? Efficiency : LargeEfficiency));
 				else
 					@this.UsedPower = 5;
-				var pressure = PhysicsHelper.GetGasPressure(ref pumpedGas, new VolumeLitres(PumpVolume), pumpedGas.Temperature);
+				var pressure = PhysicsHelper.GetGasPressure(ref pumpedGas, new VolumeLitres(PumpVolume));
 				@this.FlowIndicatorStatus = pressure.ToDouble() > 10
 					? FlowIndicatorState.Max
 					: (pressure.ToDouble() > 1
 						? (@this.VentDirection is VentDirection.Inward ? FlowIndicatorState.InwardsLimited : FlowIndicatorState.OutwardsLimited)
 						: (@this.VentDirection is VentDirection.Inward ? FlowIndicatorState.InwardsVeryLimited : FlowIndicatorState.OutwardsVeryLimited));
 			}
+			return false;
+		}
+	}
+	[ConfigCategoryDefinition("Air Conditioner", "Air Conditioner", "Air Conditioner settings")]
+	[HarmonyPatch(typeof(AirConditioner))]
+	public static class AirConditionerPatches
+	{
+		[AutoConfigDefinition("Air Conditioner pumping volume", "Air Conditioner", DisplayName = "Pumping volume", DefaultValue = 10d)]
+		private static double PumpVolume { get; set; }
+		[AutoConfigDefinition("Air Conditioner pumping power", "Air Conditioner", DisplayName = "Pumping power", DefaultValue = 4000d)]
+		private static double PumpPower { get; set; }
+		[AutoConfigDefinition("Air Conditioner pump simulation iterations", "Air Conditioner", DisplayName = "Iterations", DefaultValue = 10)]
+		private static int Iterations { get; set; }
+		[AutoConfigDefinition("Air Conditioner pump gearing", "Air Conditioner", DisplayName = "Geared", DefaultValue = true)]
+		private static bool Geared { get; set; }
+		[AutoConfigDefinition("Air Conditioner pump efficiency", "Air Conditioner", DisplayName = "Efficiency", DefaultValue = 0.75d)]
+		private static float Efficiency { get; set; }
+		[PatchValidateCrc(0xB73EA6FD)]
+		[HarmonyPatch(nameof(AirConditioner.OnAtmosphericTick))]
+		[HarmonyPrefix]
+		public static bool OnAtmosphericTickPrefix(AirConditioner __instance, ref float ____powerUsedDuringTick, float ___HeatPumpIdlePower)
+		{
+			var @this = __instance;
+			var traverse = Traverse.Create(@this);
+			if (@this is null)
+				return false;
+
+			____powerUsedDuringTick = 0.0f;
+			if (!@this.OnOff || !@this.Powered || @this.Mode != 1 || !@this.IsFullyConnected || !traverse.Property<bool>("IsOperable").Value)
+			{
+				@this.ProcessedMoles = MoleQuantity.Zero;
+				return false;
+			}
+			if (RocketMath.Abs(@this.GoalTemperature - @this.InputNetwork.Atmosphere.Temperature) < TemperatureKelvin.One)
+			{
+				@this.ProcessedMoles = MoleQuantity.Zero;
+				return false;
+			}
+
+			//var transferMoles = IdealGas.Quantity(@this.PressurePerTick, new VolumeLitres(100.0), @this.InputNetwork.Atmosphere.Temperature);
+			//@this.ProcessedMoles = transferMoles;
+			var pumpingPower = DoAdiabaticPumpingIterative(
+				@this.InputNetwork.Atmosphere,
+				@this.OutputNetwork.Atmosphere,
+				MatterState.All,
+				out var pumpedGas,
+				new VolumeLitres(PumpVolume),
+				new MoleEnergy(PumpPower),
+				Geared,
+				Iterations);
+			var pumpPressure = pumpedGas.GetGasPressure(new VolumeLitres(PumpVolume));
+			var pressureEfficiency = Math.Clamp(Math.Tanh(pumpPressure.ToDouble() / 100), 0, 1);
+			if (!(pumpedGas.GetTotalMolesGassesAndLiquids <= MoleQuantity.Zero))
+			{
+				@this.ProcessedMoles = MoleQuantity.Zero;
+				return false;
+			}
+			var maxHeatTransfer = 14000d;
+			var heatTransferEfficiency = (double)@this.TemperatureDeltaEfficiency.Evaluate(
+				(@this.GoalTemperature > pumpedGas.Temperature
+					? @this.OutputNetwork2.Atmosphere.Temperature - pumpedGas.Temperature
+					: pumpedGas.Temperature - @this.OutputNetwork2.Atmosphere.Temperature).ToFloat());
+			var temperatureEfficiency = (double)Math.Min(
+				@this.InputAndWasteEfficiency.Evaluate(pumpedGas.Temperature.ToFloat()),
+				@this.InputAndWasteEfficiency.Evaluate(@this.OutputNetwork2.Atmosphere.GasMixture.Temperature.ToFloat()));
+			var energy = new MoleEnergy(maxHeatTransfer * heatTransferEfficiency * temperatureEfficiency * pressureEfficiency * 1.0);
+			if (@this.GoalTemperature > pumpedGas.Temperature)
+				PhysicsHelper.AddEnergy(ref @this.OutputNetwork.Atmosphere.GasMixture, PhysicsHelper.RemoveEnergy(ref @this.OutputNetwork2.Atmosphere.GasMixture, energy));
+			else
+				PhysicsHelper.AddEnergy(ref @this.OutputNetwork2.Atmosphere.GasMixture, PhysicsHelper.RemoveEnergy(ref @this.OutputNetwork.Atmosphere.GasMixture, energy));
+			@this.EnergyMoved = energy;
+			____powerUsedDuringTick = ___HeatPumpIdlePower + pumpingPower.ToFloat();
+			//@this.OutputNetwork.Atmosphere.Add(@this.InternalAtmosphere.GasMixture);
+			//@this.InternalAtmosphere.GasMixture.Reset();
+			@this.TemperatureDifferentialEfficiency = (float)heatTransferEfficiency;
+			@this.OperationalTemperatureLimitor = (float)temperatureEfficiency;
+			@this.OptimalPressureScalar = (float)pressureEfficiency;
 			return false;
 		}
 	}
@@ -725,9 +788,9 @@ public static class Patches
 			{
 				var totalEnergy = (leftMixture.TotalEnergy + rightMixture.TotalEnergy + outputMixture.TotalEnergy).ToDouble();
 
-				var outputPressure = outputMixture.GetGasPressure(outputVolume, outputMixture.Temperature);
-				var leftPressure = leftMixture.GetGasPressure(leftVolume, leftMixture.Temperature);
-				var rightPressure = rightMixture.GetGasPressure(rightVolume, rightMixture.Temperature);
+				var outputPressure = outputMixture.GetGasPressure(outputVolume);
+				var leftPressure = leftMixture.GetGasPressure(leftVolume);
+				var rightPressure = rightMixture.GetGasPressure(rightVolume);
 				// Get the difference between the lowest input pressure and the output pressure
 				var pressureDifferential = PhysicsMath.Min(leftPressure, rightPressure) - outputPressure;
 				// If it's positive, there's nothing to transfer.
@@ -753,8 +816,8 @@ public static class Patches
 				outputMixture1.Add(inputMixture1.Remove(matterFlow1, MatterState.All));
 				outputMixture2.Add(inputMixture2.Remove(matterFlow2, MatterState.All));
 				// Get the pressure change that each input causes.
-				var outputPressureDelta1 = outputMixture1.GetGasPressure(outputVolume, outputMixture1.Temperature) - outputPressure;
-				var outputPressureDelta2 = outputMixture2.GetGasPressure(outputVolume, outputMixture2.Temperature) - outputPressure;
+				var outputPressureDelta1 = outputMixture1.GetGasPressure(outputVolume) - outputPressure;
+				var outputPressureDelta2 = outputMixture2.GetGasPressure(outputVolume) - outputPressure;
 				// This is not the actual pressure increase when both inputs are opened to maximum, but just used as a sum for finding the correct scaling factor.
 				var pressureDeltaSum = outputPressureDelta1 + outputPressureDelta2;
 				// Given the sum, calculate the ideal pressure change that each input should cause if flow rate is not limited.
@@ -871,10 +934,17 @@ public static class Patches
 			if (!@this.HasOpenGrid || (@this.DockedAtmosArm != null && @this.DockedAtmosArm.ArmState == ArmState.Down))
 				return false;
 			var atmosphere = traverse.Property<AtmosphericsController>("AtmosphericsController").Value.CloneGlobalAtmosphere(@this.WorldGrid);
+			//var pressureExternal = atmosphere.PressureGassesAndLiquids;
+			//var temperatureExternal = atmosphere.Temperature;
+			//var pressureInternal = @this.PipeNetwork.Atmosphere.PressureGassesAndLiquids;
+			//var temperatureInternal = @this.PipeNetwork.Atmosphere.Temperature;
 			if (IsSubmerged(@this.Position, atmosphere))
-				Mix(@this.PipeNetwork?.Atmosphere, atmosphere, PipeVolume, MatterState.All);
+				Mix(@this.PipeNetwork?.Atmosphere, atmosphere, @this.Volume, MatterState.All);
 			else
-				Mix(@this.PipeNetwork?.Atmosphere, atmosphere, PipeVolume, MatterState.All, MatterState.Gas);
+				Mix(@this.PipeNetwork?.Atmosphere, atmosphere, @this.Volume, MatterState.All, MatterState.Gas);
+			//AdiabaticsMod.Instance.Logger.LogDebug($"PassiveVent {GameManager.GameTickCount}.\n" +
+			//	$"Before: External {pressureExternal.ToDouble()}kPa, {temperatureExternal.ToDouble()}K, Internal {pressureInternal.ToDouble()}kPa, {temperatureInternal.ToDouble()}K\n" +
+			//	$"After: External {atmosphere.PressureGassesAndLiquids.ToDouble()}kPa, {atmosphere.Temperature.ToDouble()}K, Internal {@this.PipeNetwork.Atmosphere.PressureGassesAndLiquids.ToDouble()}kPa, {@this.PipeNetwork.Atmosphere.Temperature.ToDouble()}K");
 			return false;
 		}
 	}
