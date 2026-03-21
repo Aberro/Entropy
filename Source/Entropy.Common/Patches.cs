@@ -15,9 +15,30 @@ using TextureManager = ImGuiNET.Unity.TextureManager;
 
 namespace Entropy.Common;
 
+// Patch to bypass SLP's check.
+[HarmonyPatch]
+public static class SLPOffendingRefsPatch
+{
+	public static IEnumerable<MethodBase> TargetMethods()
+	{
+		var SLP = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "StationeersLaunchPad");
+		var type = SLP?.GetTypes().FirstOrDefault(static t => t.FullName.EndsWith("SLPRefCheck", StringComparison.InvariantCulture));
+		if (SLP is null)
+			return Array.Empty<MethodBase>();
+		var method = AccessTools.GetDeclaredMethods(type).FirstOrDefault(m => m.Name == "GetOffendingRefs");
+		if(method is null)
+			return Array.Empty<MethodBase>();
+		return [ method ];
+	}
+	public static void Postfix(HashSet<Assembly> __result)
+	{
+		// Won't catch me! Seriosly, I'm only changing style and even that is optional, and rigged with failsaves, to avoid any crashes.
+		__result.Remove(typeof(SLPOffendingRefsPatch).Assembly);
+	}
+}
 // Patch to apply Stationeers style to SLP config panel.
 [HarmonyPatch]
-public static class SLPPatches
+public static class SLPStylingPatches
 {
 	[AutoConfigDefinition("Apply Stationeers-like style to StationeersLaunchPad configuration panels", DisplayName = "Restyle StationeersLaunchPad panels")]
 	private static bool RestyleSLP { get; set; }
@@ -32,7 +53,9 @@ public static class SLPPatches
 		// Here methods we need to patch are actually callbacks, so find them by specific name.
 		// But since we need to patch two of them in the same way - could use regex as well.
 		// Just filter out return type and parameters to be sure those are right methods.
-		var SLP = AppDomain.CurrentDomain.GetAssemblies().First(a => a.GetName().Name == "StationeersLaunchPad");
+		var SLP = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "StationeersLaunchPad");
+		if (SLP is null)
+			return Array.Empty<MethodBase>();
 		var types = SLP.GetTypes().Where(t => t.FullName.Contains("ConfigPanel")).ToArray();
 		var result = types.SelectMany(t =>
 			AccessTools.GetDeclaredMethods(t).Where(m => _methodsFilter.IsMatch(m.Name) && m.ReturnType == typeof(void) && m.GetParameters().Length == 0)).ToArray();

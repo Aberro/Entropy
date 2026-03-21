@@ -3,7 +3,7 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.Adiabatics")]
 [assembly: AssemblyCompany("Aberro")]
-[assembly: AssemblyVersion("1.0.0.464")]
+[assembly: AssemblyVersion("1.0.0.475")]
 [assembly: AssemblyDescription(@"
 [h1][color=#ffa500]Entropy.Adiabatics[/color][/h1][br]
 [h2][color=#ff0000]Experimental![/color][/h2][br]
@@ -42,11 +42,11 @@ See: [url=https://github.com/StationeersLaunchPad/StationeersLaunchPad]Stationee
 [assembly: AssemblyMetadata(AssemblyMetadata.Tag, Tags.StationeersLaunchPad)]
 [assembly: AssemblyMetadata(AssemblyMetadata.DependsOn, "ModID=\"Entropy.Common\"")]
 [assembly: AssemblyMetadata(AssemblyMetadata.OrderAfter, "ModID=\"Entropy.Common\"")]
-// Last processed commit: c1b2fee7f4fa2ca5d281897a634498e130300c40
-// Last processed version: 1.0.0.462
+// Last processed commit: 05b9a12596f6910d2f231a63a4b78651c79627ed
+// Last processed version: 1.0.0.465
 [assembly: AssemblyMetadata(AssemblyMetadata.ChangeLog, @"
-	[h1]Update v1.0.0.421 to v1.0.0.462[/h1]
+	[h1]Update v1.0.0.462 to v1.0.0.465[/h1]
 	[list]
-		[*] Attempt to fix passive vents/passive equalization.
+		[*] Updated to latest Stationeer version with new gases. PhysicsHelper.cs: * Fixed MolesEnumerator skipping first gas. * Fix for GetGasPressure to include minimum gas volume. * Removed GetMatterFlowRateThroughOrifice as incorrect (it calculates the matter flow, which is only useful for isobaric process) * Complete rework of Mix method. * Extracted Equalize method to use in mixer. Patches.cs: * Updated MixerPatches to use new Equalize method to equalize atmospheres on two sides limited by mixing volume.
 	[/list]
 ")]

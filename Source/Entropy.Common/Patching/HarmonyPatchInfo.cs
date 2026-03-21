@@ -241,7 +241,7 @@ public class HarmonyPatchInfo
 						actualCrc = crc;
 						if (validateCrc.CRC != crc)
 						{
-							CommonMod.Instance.Logger.LogError($"Target method `{originalMethod.DeclaringType.FullName}.{originalMethod.Name}` for patch {declaringType.Name}.{declaringMethod} CRC validation failed: expected {validateCrc.CRC}, actual {crc}! The patch needs to be updated!");
+							CommonMod.Instance.Logger.LogError($"Target method `{originalMethod.DeclaringType.FullName}.{originalMethod.Name}` for patch {declaringType.Name}.{declaringMethod} CRC validation failed: expected 0x{validateCrc.CRC:X8}, actual 0x{crc:X8}! The patch needs to be updated!");
 							invalid = true;
 						}
 					}

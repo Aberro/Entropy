@@ -3,7 +3,7 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.CodeEditor")]
 [assembly: AssemblyCompany("Aberro")]
-[assembly: AssemblyVersion("1.0.0.481")]
+[assembly: AssemblyVersion("1.0.0.492")]
 [assembly: AssemblyDescription(@"
 [h1][color=#ffa500]Entropy.CodeEditor[/color][/h1][br]
 Advanced source code editor for programmable chips in Stationeers.[br]
@@ -34,11 +34,11 @@ See: [url=https://github.com/StationeersLaunchPad/StationeersLaunchPad]Stationee
 ////////////////////////////////////
 // Code-generated: do not modify. //
 ////////////////////////////////////
-// Last processed commit: c1b2fee7f4fa2ca5d281897a634498e130300c40
-// Last processed version: 1.0.0.479
+// Last processed commit: 05b9a12596f6910d2f231a63a4b78651c79627ed
+// Last processed version: 1.0.0.482
 [assembly: AssemblyMetadata(AssemblyMetadata.ChangeLog, @"
-	[h1]Update v1.0.0.438 to v1.0.0.479[/h1]
+	[h1]Update v1.0.0.479 to v1.0.0.482[/h1]
 	[list]
-		[*] Attempt to fix passive vents/passive equalization.
+		[*] Updated to latest Stationeer version with new gases. PhysicsHelper.cs: * Fixed MolesEnumerator skipping first gas. * Fix for GetGasPressure to include minimum gas volume. * Removed GetMatterFlowRateThroughOrifice as incorrect (it calculates the matter flow, which is only useful for isobaric process) * Complete rework of Mix method. * Extracted Equalize method to use in mixer. Patches.cs: * Updated MixerPatches to use new Equalize method to equalize atmospheres on two sides limited by mixing volume.
 	[/list]
 ")]

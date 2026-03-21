@@ -33,13 +33,14 @@ public static class Patches
 	public static class DynamicGeneratorPatches
 	{
 		// This patch only validates that OnAtmosphericTick hasn't been modified.
-		[PatchValidateCrc(0x2B0C49E4)]
+		[PatchValidateCrc(0xDC386ED5)]
 		[HarmonyPatch(nameof(DynamicGenerator.OnAtmosphericTick))]
 		[HarmonyPrefix]
 		public static void OnAtmosphericTickPrefix() { }
+
 		// PowerGeneration is executed in OnAtmospohericTick before resetting the internal atmosphere. So, we could use it to introduce adiabatic pumping,
 		// instead of patching the OnAtmosphericTick.
-		[PatchValidateCrc(0x93FF3DC4)]
+		[PatchValidateCrc(0x4C01FE63)]
 		[HarmonyPatch("PowerGeneration")]
 		[HarmonyPrefix]
 		public static void PowerGenerationPrefix(DynamicGenerator __instance, ref float ____powerGenerated, ref MoleEnergy ____previousCombustionEnergy)
@@ -47,6 +48,7 @@ public static class Patches
 			var @this = __instance;
 			if (@this is null)
 				return;
+
 			// Calculate the amount of energy the pumping gas out takes.
 			var gasMixture = @this.WorldAtmosphere.GasMixture;
 			PhysicsHelper.Add(ref gasMixture, ref __instance.InternalAtmosphere.GasMixture);
@@ -79,7 +81,56 @@ public static class Patches
 		private static bool Geared { get; set; }
 		[AutoConfigDefinition("Portable scrubber pump efficiency", "Portable Scrubber", DisplayName = "Efficiency", DefaultValue = 0.75d)]
 		private static float Efficiency { get; set; }
-		[PatchValidateCrc(0x6B485A28)]
+		/*
+		public override void OnAtmosphericTick()
+		{
+			base.OnAtmosphericTick();
+			if (!this.OnOff || !(bool) (UnityEngine.Object) this.BatteryCell || this.BatteryCell.IsEmpty)
+			{
+				if (!this.Powered)
+					return;
+				OnServer.Interact(this.InteractPowered, 0);
+			}
+			else
+			{
+				if (!this.Powered)
+					OnServer.Interact(this.InteractPowered, 1);
+				if (!this.IsOperable())
+					return;
+				this.BatteryCell.PowerStored -= this.UsedPower;
+				if (this.IsOpen)
+					this.ReleaseToAtmos();
+				else
+					this.GetFromAtmos();
+			}
+		}
+
+		private void ReleaseToAtmos()
+		{
+			if (this.WorldAtmosphere == null)
+				this.WorldAtmosphere = this.GridController.AtmosphericsController.CloneGlobalAtmosphere(this.WorldGrid);
+			if (this.InternalAtmosphere.PressureGassesAndLiquids < new PressurekPa(100.0))
+			{
+				this.WorldAtmosphere.Add(this.InternalAtmosphere.GasMixture);
+				this.InternalAtmosphere.GasMixture.Reset();
+			}
+			else
+				AtmosphereHelper.MoveVolume(this.InternalAtmosphere, this.WorldAtmosphere, this.InternalAtmosphere.Volume * 0.05000000074505806, AtmosphereHelper.MatterState.All, MoleQuantity.Zero);
+		}
+
+		private void GetFromAtmos()
+		{
+			if (this.WorldAtmosphere == null)
+				return;
+			this.WorldAtmosphere = this.GridController.AtmosphericsController.CloneGlobalAtmosphere(this.WorldGrid);
+			if (this.WorldAtmosphere.IsAboveArmstrong())
+				this.WorldAtmosphere.GasMixture.AddEnergy(new MoleEnergy((double) this.UsedPower * (double) this.PowerEfficiency));
+			this.GetFromCell((Grid3) this.WorldGrid);
+			foreach (Grid3 openNeighbor in this.WorldAtmosphere.OpenNeighbors)
+				this.GetFromCell(openNeighbor);
+		}
+		 */
+		[PatchValidateCrc(0xF413D5AB)]
 		[HarmonyPatch(nameof(DynamicScrubber.OnAtmosphericTick))]
 		[HarmonyPrefix]
 		public static bool OnAtmosphericTickPrefix(DynamicScrubber __instance)
@@ -171,8 +222,21 @@ public static class Patches
 		private static bool Geared { get; set; }
 		[AutoConfigDefinition("Advanced Furnace pump efficiency", "Advanced Furnace", DisplayName = "Efficiency", DefaultValue = 0.75d)]
 		private static float Efficiency { get; set; }
-
-		[PatchValidateCrc(0xEAF67EF2)]
+		/*
+		public override void HandleGasInput()
+		{
+			if (!this.OnOff || !this.Powered || this.Error > 0)
+				return;
+			if (this.InputNetwork != null)
+				AtmosphereHelper.MoveVolume(this.InputNetwork.Atmosphere, this.InternalAtmosphere, new VolumeLitres((double) this.OutputSetting2), AtmosphereHelper.MatterState.All, MoleQuantity.Zero);
+			if (this.OutputNetwork != null)
+				AtmosphereHelper.MoveVolume(this.InternalAtmosphere, this.OutputNetwork.Atmosphere, new VolumeLitres((double) this.OutputSetting), AtmosphereHelper.MatterState.Gas, MoleQuantity.Zero);
+			if (this.OutputNetwork2 == null)
+				return;
+			AtmosphereHelper.MoveLiquidVolume(this.InternalAtmosphere, this.OutputNetwork2.Atmosphere, new VolumeLitres((double) this.OutputSetting));
+		}
+		 */
+		[PatchValidateCrc(0xCC496EEA)]
 		[HarmonyPatch(nameof(AdvancedFurnace.HandleGasInput))]
 		[HarmonyPrefix]
 		public static bool HandleGasInputPrefix(AdvancedFurnace __instance)
@@ -224,8 +288,45 @@ public static class Patches
 		private static bool Geared { get; set; }
 		[AutoConfigDefinition("Industrial Burner pump efficiency", "Industrial Burner", DisplayName = "Efficiency", DefaultValue = 0.75d)]
 		private static float Efficiency { get; set; }
-
-		[PatchValidateCrc(0x8A3ECBB4)]
+		/*
+		public override void HandleGasInput()
+		{
+			if (!this.IsStructureCompleted || !this.FullyExtended)
+				return;
+			AtmosphereHelper.MoveToEqualize(this.InternalAtmosphere, this.AtmosphericsController.CloneGlobalAtmosphere(this.ChimneyExtension.VentGrid), new PressurekPa((double) RocketMath.MapToScaleClamp(PressurekPa.Zero.ToFloat(), Chemistry.Limits.MAXPressureGasPipe.ToFloat(), Chemistry.OneAtmosphere.ToFloat(), Chemistry.Limits.MAXPressureGasPipe.ToFloat() / 10f, this.InternalAtmosphere.PressureGasses.ToFloat())), AtmosphereHelper.MatterState.Gas);
+			if (!this.OnOff || !this.Powered || !this.IsOperable)
+				return;
+			if (this.InputNetwork != null)
+				AtmosphereHelper.MoveVolume(this.InputNetwork.Atmosphere, this.InternalAtmosphere, new VolumeLitres((double) this.OutputSetting), AtmosphereHelper.MatterState.All, MoleQuantity.Zero);
+			if (!this.CanBurn())
+				return;
+			double carbonUsed = 0.0;
+			double hydrocarbonUsed = 0.0;
+			MoleQuantity quantity = this.InternalAtmosphere.GasMixture.Oxygen.Quantity;
+			GasMixture gasMixture = GasMixtureHelper.Invalid;
+			if ((double) (Reagent) this.ReagentMixture.Carbon > 0.0)
+			{
+				carbonUsed = Math.Min(quantity.ToDouble() / 100.0, this.ReagentMixture.Carbon.Quantity);
+				gasMixture = this.InternalAtmosphere.Remove(new MoleQuantity(carbonUsed * 100.0), Chemistry.GasType.Oxygen);
+			}
+			else if ((double) (Reagent) this.ReagentMixture.Hydrocarbon > 0.0)
+			{
+				hydrocarbonUsed = Math.Min(quantity.ToDouble() / 100.0, this.ReagentMixture.Hydrocarbon.Quantity);
+				gasMixture = this.InternalAtmosphere.Remove(new MoleQuantity(hydrocarbonUsed * 100.0), Chemistry.GasType.Oxygen);
+			}
+			if (gasMixture.IsValid)
+			{
+				float pollutantRatio = this.CarbonDioxideToPollutantRatio();
+				this.CarbonToPollutantRatio = pollutantRatio;
+				this.InternalAtmosphere.Add(new Mole(Chemistry.GasType.CarbonDioxide, gasMixture.Oxygen.Quantity * (double) pollutantRatio, gasMixture.Oxygen.Energy * (double) pollutantRatio));
+				this.InternalAtmosphere.Add(new Mole(Chemistry.GasType.Pollutant, gasMixture.Oxygen.Quantity * (1.0 - (double) pollutantRatio), gasMixture.Oxygen.Energy * (1.0 - (double) pollutantRatio)));
+				this.InternalAtmosphere.GasMixture.AddEnergy(new MoleEnergy((carbonUsed + hydrocarbonUsed) * 2300000.0));
+			}
+			this.BurnCancellation.CancelAndInitialize();
+			this.BurnCarbonNextFrame(this.BurnCancellation.Token, carbonUsed, hydrocarbonUsed).Forget();
+		}
+		 */
+		[PatchValidateCrc(0x8B72F7C1)]
 		[HarmonyPatch(nameof(IndustrialBurner.HandleGasInput))]
 		[HarmonyPrefix]
 		public static bool HandleGasInputPrefix(IndustrialBurner __instance, CancellationTokenWrapper ___BurnCancellation)
@@ -290,47 +391,6 @@ public static class Patches
 			return false;
 		}
 	}
-	[ConfigCategoryDefinition("Liquid Rocket", "Liquid Rocket", "Liquid Rocket pump settings")]
-	[HarmonyPatch(typeof(LiquidRocketEngine))]
-	public static class LiquidRocketEnginePatches
-	{
-		[AutoConfigDefinition("Liquid Rocket pumping volume", "Liquid Rocket", DisplayName = "Pumping volume", DefaultValue = 5d)]
-		private static double PumpVolume { get; set; }
-		[AutoConfigDefinition("Liquid Rocket pumping power", "Liquid Rocket", DisplayName = "Pumping power", DefaultValue = 50d)]
-		private static double PumpPower { get; set; }
-		[AutoConfigDefinition("Liquid Rocket simulation iterations", "Liquid Rocket", DisplayName = "Iterations", DefaultValue = 10)]
-		private static int Iterations { get; set; }
-		[AutoConfigDefinition("Liquid Rocket pump gearing", "Liquid Rocket", DisplayName = "Geared", DefaultValue = true)]
-		private static bool Geared { get; set; }
-		[AutoConfigDefinition("Liquid Rocket pump efficiency", "Liquid Rocket", DisplayName = "Efficiency", DefaultValue = 0.75d)]
-		private static float Efficiency { get; set; }
-
-		[PatchValidateCrc(0xECF97D03)]
-		[HarmonyPatch("MovePropellant")]
-		[HarmonyPrefix]
-		public static bool MovePropellantPrefix(
-			LiquidRocketEngine __instance,
-			Atmosphere internalAtmosphere,
-			Atmosphere input1,
-			Atmosphere input2)
-		{
-			var @this = __instance;
-			var traverse = new Traverse(@this);
-			if(@this is null || input1 is null || internalAtmosphere is null)
-				return false;
-
-			DoAdiabaticPumpingIterative(
-				input1,
-				internalAtmosphere,
-				MatterState.All,
-				new VolumeLitres(PumpVolume * (@this.OutputSetting / @this.MaxSetting)),
-				new MoleEnergy(PumpPower * Efficiency),
-				Geared,
-				Iterations).ToFloat();
-			traverse.Property("PassedMoles").SetValue(internalAtmosphere.TotalMoles);
-			return false;
-		}
-	}
 	[ConfigCategoryDefinition("Landing Pad Connection", "Landing Pad Connection", "Landing Pad Connection pump settings")]
 	[HarmonyPatch(typeof(LandingPadGas))]
 	public static class LandingPadGasPatches
@@ -346,7 +406,29 @@ public static class Patches
 		[AutoConfigDefinition("Landing Pad Connection pump efficiency", "Landing Pad Connection", DisplayName = "Efficiency", DefaultValue = 0.75d)]
 		private static float Efficiency { get; set; }
 
-		[PatchValidateCrc(0x4EBD64D7)]
+		/*
+		public override void OnAtmosphericTick()
+		{
+			base.OnAtmosphericTick();
+			if (!this.OnOff || !this.Powered || !this.IsOperable)
+				return;
+			Atmosphere inputAtmos = this.input ? this.InputNetwork.Atmosphere : this.LandingPadNetwork.Atmosphere;
+			Atmosphere outputAtmos = this.input ? this.LandingPadNetwork.Atmosphere : this.OutputNetwork.Atmosphere;
+			switch (this.pumpType)
+			{
+				case AtmosphereHelper.MatterState.Liquid:
+					AtmosphereHelper.MoveLiquidVolume(inputAtmos, outputAtmos, new VolumeLitres((double) this.OutputSetting));
+					break;
+				case AtmosphereHelper.MatterState.Gas:
+					AtmosphereHelper.MoveVolume(inputAtmos, outputAtmos, new VolumeLitres((double) this.OutputSetting), AtmosphereHelper.MatterState.Gas, new MoleQuantity((double) this.OutputSetting));
+					break;
+				default:
+					ConsoleWindow.PrintError(this.DisplayName + " unsupported matter state");
+					break;
+			}
+		}
+		 */
+		[PatchValidateCrc(0xB87646C5)]
 		[HarmonyPatch(nameof(LandingPadGas.OnAtmosphericTick))]
 		[HarmonyPrefix]
 		public static bool OnAtmosphericTickPrefix(LandingPadGas __instance, bool ___input, MatterState ___pumpType)
@@ -397,7 +479,37 @@ public static class Patches
 		[AutoConfigDefinition("Landing Pad Tank pump efficiency", "Landing Pad Tank", DisplayName = "Efficiency", DefaultValue = 0.75d)]
 		private static float Efficiency { get; set; }
 
-		[PatchValidateCrc(0xD5B26CAE)]
+		/*
+		public override void OnAtmosphericTick()
+		{
+			base.OnAtmosphericTick();
+			if (!this.OnOff || !this.Powered || !this.IsOperable)
+				return;
+			PortableAtmospherics portableAtmospherics = this.TankSlot.Get<PortableAtmospherics>();
+			if (portableAtmospherics == null)
+			{
+				this.SetPumpOnOff(0);
+			}
+			else
+			{
+				Atmosphere inputAtmos = this.Mode == 1 ? portableAtmospherics.InternalAtmosphere : this.LandingPadNetwork.Atmosphere;
+				Atmosphere outputAtmos = this.Mode == 1 ? this.LandingPadNetwork.Atmosphere : portableAtmospherics.InternalAtmosphere;
+				switch (this.pumpType)
+				{
+					case AtmosphereHelper.MatterState.Liquid:
+						AtmosphereHelper.MoveLiquidVolume(inputAtmos, outputAtmos, new VolumeLitres((double) this.volumeMoved));
+						break;
+					case AtmosphereHelper.MatterState.Gas:
+						AtmosphereHelper.MoveVolume(inputAtmos, outputAtmos, new VolumeLitres((double) this.volumeMoved), AtmosphereHelper.MatterState.Gas, new MoleQuantity((double) this.volumeMoved));
+						break;
+					default:
+						ConsoleWindow.PrintError(this.DisplayName + " unsupported matter state");
+						break;
+				}
+			}
+		}
+		 */
+		[PatchValidateCrc(0x7C9C7533)]
 		[HarmonyPatch(nameof(LandingPadTankConnector.OnAtmosphericTick))]
 		[HarmonyPrefix]
 		public static bool OnAtmosphericTickPrefix(LandingPadTankConnector __instance, MatterState ___pumpType, float ___volumeMoved)
@@ -411,9 +523,7 @@ public static class Patches
 				return false;
 			var portableAtmospherics = @this.TankSlot.Get<PortableAtmospherics>();
 			if(portableAtmospherics == null)
-			{
 				traverse.Method("SetPumpOnOff").GetValue(0);
-			}
 			else
 			{
 				var inputAtmos = @this.Mode == 1 ? portableAtmospherics.InternalAtmosphere : @this.LandingPadNetwork.Atmosphere;
@@ -467,7 +577,22 @@ public static class Patches
 		[AutoConfigDefinition("Turbo Pump efficiency", "Turbo Pump", DisplayName = "Efficiency", DefaultValue = 0.75d)]
 		private static float TurboPumpEfficiency { get; set; }
 
-		[PatchValidateCrc(0x13980E2C)]
+		/*
+			switch (outputAtmosphere.AllowedMatterState)
+			{
+				case AtmosphereHelper.MatterState.Liquid:
+					AtmosphereHelper.MoveLiquidVolume(inputAtmosphere, outputAtmosphere, new VolumeLitres((double) this.OutputSetting));
+					AtmosphereHelper.MoveToEqualize(inputAtmosphere, outputAtmosphere, PressurekPa.MaxValue, AtmosphereHelper.MatterState.Gas);
+					break;
+				case AtmosphereHelper.MatterState.Gas:
+				case AtmosphereHelper.MatterState.All:
+					AtmosphereHelper.MoveVolume(inputAtmosphere, outputAtmosphere, new VolumeLitres((double) this.OutputSetting), AtmosphereHelper.MatterState.All, MoleQuantity.Zero);
+					break;
+			}
+		 */
+
+		// For gases the patch completely replaces the code with our adiabatic pumping. For liquids - it falls back to original method.
+		[PatchValidateCrc(0x74A7B0FE)]
 		[HarmonyPatch("MoveAtmosphere")]
 		[HarmonyPrefix]
 		public static bool MoveAtmospherePrefix(VolumePump __instance, Atmosphere inputAtmosphere, Atmosphere outputAtmosphere)
@@ -478,9 +603,11 @@ public static class Patches
 			switch(outputAtmosphere.AllowedMatterState)
 			{
 			case MatterState.Liquid:
+				// Fallback to original method.
 				return true;
 			case MatterState.Gas:
 			case MatterState.All:
+				// Switch between kinds of pumps.
 				if(@this is TurboVolumePump)
 				{
 					@this.UsedPower = 5 + Math.Max(0, DoAdiabaticPumpingIterative(
@@ -524,7 +651,7 @@ public static class Patches
 		[AutoConfigDefinition("Active Vent efficiency", "Active Vent", DisplayName = "Efficiency", DefaultValue = 0.75d)]
 		private static float Efficiency { get; set; }
 
-		[PatchValidateCrc(0x45261029)]
+		[PatchValidateCrc(0x71808F6E)]
 		[HarmonyPatch(nameof(ActiveVent.OnAtmosphericTick))]
 		[HarmonyPrefix]
 		public static bool OnAtmosphericTickPrefix(ActiveVent __instance)
@@ -616,7 +743,20 @@ public static class Patches
 		[AutoConfigDefinition("Powered Vent Large efficiency", "Powered Vent Large", DisplayName = "Efficiency", DefaultValue = 0.75d)]
 		private static float LargeEfficiency { get; set; }
 
-		[PatchValidateCrc(0x9B94AD77)]
+		/*
+		public override void OnAtmosphericTick()
+		{
+			base.OnAtmosphericTick();
+			if (!this.IsOperable || !this.IsStructureCompleted)
+				this.FlowIndicatorStatus = FlowIndicatorState.None;
+			else if (!this.OnOff || !this.Powered)
+				this.FlowIndicatorStatus = FlowIndicatorState.None;
+			else
+				this.ExchangeWithWorld();
+		}
+		 */
+		// This patch replaces OnAtmosphericTick and intentionally skips ExchangeWithTheWorld - we do it's implementation using adiabatic pumping.
+		[PatchValidateCrc(0x106E06C2)]
 		[HarmonyPatch(nameof(PoweredVent.OnAtmosphericTick))]
 		[HarmonyPrefix]
 		public static bool OnAtmosphericTick(PoweredVent __instance)
@@ -678,7 +818,46 @@ public static class Patches
 		private static bool Geared { get; set; }
 		[AutoConfigDefinition("Air Conditioner pump efficiency", "Air Conditioner", DisplayName = "Efficiency", DefaultValue = 0.75d)]
 		private static float Efficiency { get; set; }
-		[PatchValidateCrc(0xB73EA6FD)]
+		/*
+		public override void OnAtmosphericTick()
+		{
+			this._powerUsedDuringTick = 0.0f;
+			if (this.OnOff && this.Powered && this.Mode == 1 && this.IsFullyConnected && this.IsOperable)
+			{
+				if (RocketMath.Abs(this.GoalTemperature - this.InputNetwork.Atmosphere.Temperature) >= TemperatureKelvin.One)
+				{
+					PressurekPa pressurekPa = new PressurekPa(0.1);
+					float num1 = Mathf.Clamp01(RocketMath.Min(this.InputNetwork.Atmosphere.PressureGasses / Chemistry.OneAtmosphere - pressurekPa, this.OutputNetwork2.Atmosphere.PressureGasses / Chemistry.OneAtmosphere - pressurekPa).ToFloat());
+					MoleQuantity transferMoles = IdealGas.Quantity(this.PressurePerTick, new VolumeLitres(100.0), this.InputNetwork.Atmosphere.Temperature);
+					this.ProcessedMoles = transferMoles;
+					if (!(transferMoles > MoleQuantity.Zero))
+						return;
+					this.InternalAtmosphere.Add(this.InputNetwork.Atmosphere.Remove(transferMoles, AtmosphereHelper.MatterState.All));
+					float num2 = 14000f;
+					float num3 = this.TemperatureDeltaEfficiency.Evaluate((this.GoalTemperature > this.InternalAtmosphere.GasMixture.Temperature ? this.OutputNetwork2.Atmosphere.Temperature - this.InternalAtmosphere.GasMixture.Temperature : this.InternalAtmosphere.GasMixture.Temperature - this.OutputNetwork2.Atmosphere.Temperature).ToFloat());
+					float num4 = Math.Min(this.InputAndWasteEfficiency.Evaluate(this.InternalAtmosphere.GasMixture.Temperature.ToFloat()), this.InputAndWasteEfficiency.Evaluate(this.OutputNetwork2.Atmosphere.GasMixture.Temperature.ToFloat()));
+					double num5 = 1.0;
+					MoleEnergy energy = new MoleEnergy((double) num2 * (double) num3 * (double) num4 * (double) num1 * num5);
+					if (this.GoalTemperature > this.InternalAtmosphere.GasMixture.Temperature)
+						this.InternalAtmosphere.GasMixture.AddEnergy(this.OutputNetwork2.Atmosphere.GasMixture.RemoveEnergy(energy));
+					else
+						this.OutputNetwork2.Atmosphere.GasMixture.AddEnergy(this.InternalAtmosphere.GasMixture.RemoveEnergy(energy));
+					this.EnergyMoved = energy;
+					this._powerUsedDuringTick = this.HeatPumpIdlePower;
+					this.OutputNetwork.Atmosphere.Add(this.InternalAtmosphere.GasMixture);
+					this.InternalAtmosphere.GasMixture.Reset();
+					this.TemperatureDifferentialEfficiency = num3;
+					this.OperationalTemperatureLimitor = num4;
+					this.OptimalPressureScalar = num1;
+				}
+				else
+					this.ProcessedMoles = MoleQuantity.Zero;
+			}
+			else
+				this.ProcessedMoles = MoleQuantity.Zero;
+		}
+		 */
+		[PatchValidateCrc(0x2EE5E2E2)]
 		[HarmonyPatch(nameof(AirConditioner.OnAtmosphericTick))]
 		[HarmonyPrefix]
 		public static bool OnAtmosphericTickPrefix(AirConditioner __instance, ref float ____powerUsedDuringTick, float ___HeatPumpIdlePower)
@@ -747,8 +926,52 @@ public static class Patches
 		[ConfigCategoryDefinition("Mixer", "Mixer", "Mixer configuration")]
 		[AutoConfigDefinition("Mixer volume", "Mixer", DisplayName = "Mixer volume", DefaultValue = 10)]
 		public static double VolumeMixer { get; set; }
-
-		[PatchValidateCrc(0x04559353)]
+		/*public override void OnAtmosphericTick()
+		{
+			base.OnAtmosphericTick();
+			GasMixture gasMixture = GasMixtureHelper.Create();
+			Thing.Event onGasMixChanged = this.OnGasMixChanged;
+			if (onGasMixChanged != null)
+				onGasMixChanged();
+			if (!this.OnOff || !this.Powered || this.Error == 1 || !this.IsOperable)
+				return;
+			MoleQuantity transferMoles1 = IdealGas.Quantity(this.PressurePerTick * ((double) this.Ratio1 / 100.0), Chemistry.PipeVolume, this.InputNetwork.Atmosphere.Temperature);
+			MoleQuantity transferMoles2 = IdealGas.Quantity(this.PressurePerTick * ((double) this.Ratio2 / 100.0), Chemistry.PipeVolume, this.InputNetwork2.Atmosphere.Temperature);
+			PressurekPa pressureDifferential = RocketMath.WeightedAverage(this.InputNetwork.Atmosphere.PressureGasses, this.InputNetwork2.Atmosphere.PressureGasses, this.Ratio1 / 100f) - this.OutputNetwork.Atmosphere.PressureGasses;
+			if (pressureDifferential > PressurekPa.Zero)
+			{
+				MoleQuantity moleQuantity1 = this.MaxMolesPerTick(this.InputNetwork.Atmosphere, pressureDifferential);
+				MoleQuantity moleQuantity2 = this.MaxMolesPerTick(this.InputNetwork2.Atmosphere, pressureDifferential);
+				float val1 = (moleQuantity1 / transferMoles1).ToFloat();
+				MoleQuantity moleQuantity3 = transferMoles2;
+				float val2 = (moleQuantity2 / moleQuantity3).ToFloat();
+				double num = Math.Max(1.0, !RocketMath.Approximately((double) this.Ratio1, 100.0) ? (!RocketMath.Approximately((double) this.Ratio2, 100.0) ? (double) Math.Min(val1, val2) : (double) val2) : (double) val1);
+				transferMoles1 *= num;
+				transferMoles2 *= num;
+			}
+			MoleQuantity gassesAndLiquids1 = this.InputNetwork.Atmosphere.GasMixture.GetTotalMolesGassesAndLiquids;
+			MoleQuantity gassesAndLiquids2 = this.InputNetwork2.Atmosphere.GasMixture.GetTotalMolesGassesAndLiquids;
+			if (gassesAndLiquids1 < transferMoles1 || gassesAndLiquids2 < transferMoles2)
+			{
+				MoleQuantity moleQuantity = MoleQuantity.Zero;
+				if (transferMoles1 > MoleQuantity.Zero && transferMoles2 > MoleQuantity.Zero)
+					moleQuantity = RocketMath.Min(gassesAndLiquids1 / transferMoles1, gassesAndLiquids2 / transferMoles2);
+				else if (transferMoles2 < Chemistry.MINIMUM_VALID_TOTAL_MOLES && transferMoles1 > MoleQuantity.Zero)
+					moleQuantity = gassesAndLiquids1 / transferMoles1;
+				else if (transferMoles1 < Chemistry.MINIMUM_VALID_TOTAL_MOLES && transferMoles2 > MoleQuantity.Zero)
+					moleQuantity = gassesAndLiquids2 / transferMoles2;
+				transferMoles1 *= moleQuantity;
+				transferMoles2 *= moleQuantity;
+			}
+			if (transferMoles1 > MoleQuantity.Zero)
+				gasMixture.Add(this.InputNetwork.Atmosphere.Remove(transferMoles1, AtmosphereHelper.MatterState.All));
+			if (transferMoles2 > MoleQuantity.Zero)
+				gasMixture.Add(this.InputNetwork2.Atmosphere.Remove(transferMoles2, AtmosphereHelper.MatterState.All));
+			this.OutputNetwork.Atmosphere.Add(gasMixture);
+		}
+		 */
+		// This patch completely replaces OnAtmosphericTick to use our own adiabatic implementation of passive mixing of gases, by PhysicsHelper.Equalize.
+		[PatchValidateCrc(0x82CF0C7A)]
 		[HarmonyPatch(nameof(Mixer.OnAtmosphericTick))]
 		[HarmonyPrefix]
 		public static bool OnAtmosphericTickPrefix(Mixer __instance)
@@ -861,7 +1084,56 @@ public static class Patches
 	[HarmonyPatch(typeof(Pipe))]
 	public static class PipePatches
 	{
-		[PatchValidateCrc(0x0A365CC1)]
+		/*
+		public override void OnAtmosphericTick()
+		{
+			base.OnAtmosphericTick();
+			RocketState? rocketState = this.RocketNetwork?.Rocket?.RocketState;
+			bool flag;
+			if (rocketState.HasValue)
+			{
+				switch (rocketState.GetValueOrDefault())
+				{
+					case RocketState.Launching:
+					case RocketState.Landing:
+						flag = true;
+						goto label_4;
+				}
+			}
+			flag = false;
+label_4:
+			if (flag)
+				this.RegisterCurrentGrids();
+			if (!this._bursting)
+				return;
+			this.PipeNetwork.SetNetworkFault(true);
+			if (!this.CanMixInWorld())
+				return;
+			this.SpawnIces().Forget();
+			foreach (WorldGrid currentGrid in this.CurrentGrids)
+			{
+				if (this.GridController.CanContainAtmos(currentGrid))
+				{
+					PressurekPa gassesAndLiquids = this.PipeNetwork.Atmosphere.PressureGassesAndLiquids;
+					Assets.Scripts.Atmospherics.Atmosphere atmosphere = this.AtmosphericsController.CloneGlobalAtmosphere(currentGrid);
+					PressurekPa pressurekPa = RocketMath.Abs(atmosphere.PressureGassesAndLiquids - gassesAndLiquids);
+					PressurekPa amountPressureToMove = RocketMath.Max(pressurekPa - this.MaxPressure, pressurekPa / 10.0 / (double) this.CurrentGrids.Count);
+					double num1 = (this.Volume / this.PipeNetwork.Atmosphere.Volume).ToDouble() * this.PipeNetwork.Atmosphere.TotalMoles.ToDouble();
+					double num2 = pressurekPa > this.MaxPressure ? 3.4028234663852886E+38 : num1;
+					VolumeLitres maxVolumeToMove = this.PipeNetwork.Atmosphere.TotalVolumeLiquids > this.PipeNetwork.Atmosphere.Volume ? this.PipeNetwork.Atmosphere.TotalVolumeLiquids - this.PipeNetwork.Atmosphere.Volume * 0.99 : this.Volume;
+					AtmosphereHelper.DrainLiquids(this.PipeNetwork.Atmosphere, atmosphere, maxVolumeToMove);
+					if (pressurekPa > Chemistry.OneAtmosphere)
+					{
+						double num3 = num2 / (double) this.CurrentGrids.Count;
+						AtmosphereHelper.MoveToEqualizeBidirectional(this.PipeNetwork.Atmosphere, atmosphere, amountPressureToMove, AtmosphereHelper.MatterState.Gas, new MoleQuantity(num3));
+					}
+					else
+						AtmosphereHelper.Mix(this.PipeNetwork.Atmosphere, atmosphere, AtmosphereHelper.MatterState.Gas);
+				}
+			}
+		}
+		 */
+		[PatchValidateCrc(0x84D28CA5)]
 		[HarmonyPatch(nameof(Pipe.OnAtmosphericTick))]
 		[HarmonyPrefix]
 		public static bool OnAtmosphericTickPrefix(Pipe __instance, bool ____bursting)
@@ -884,37 +1156,32 @@ public static class Patches
 			traverse.Method("SpawnIces").GetValue<UniTaskVoid>().Forget();
 			foreach (var currentGrid in @this.CurrentGrids)
 			{
-				if (@this.GridController.CanContainAtmos(currentGrid))
-				{
-					var gassesAndLiquids = @this.PipeNetwork.Atmosphere.PressureGassesAndLiquids;
-					var atmosphere = traverse.Property<AtmosphericsController>("AtmosphericsController").Value.CloneGlobalAtmosphere(currentGrid);
-					var pressurekPa = RocketMath.Abs(atmosphere.PressureGassesAndLiquids - gassesAndLiquids);
-					var amountPressureToMove = RocketMath.Max(pressurekPa - @this.MaxPressure, pressurekPa / 10.0 / @this.CurrentGrids.Count);
-					var num1 = (@this.Volume / @this.PipeNetwork.Atmosphere.Volume).ToDouble() * @this.PipeNetwork.Atmosphere.TotalMoles.ToDouble();
-					var num2 = pressurekPa > @this.MaxPressure ? float.MaxValue : num1;
-					var maxVolumeToMove = @this.PipeNetwork.Atmosphere.TotalVolumeLiquids > @this.PipeNetwork.Atmosphere.Volume
-						? @this.PipeNetwork.Atmosphere.TotalVolumeLiquids - (@this.PipeNetwork.Atmosphere.Volume * 0.99) 
-						: @this.Volume;
-					//DrainLiquids(@this.PipeNetwork.Atmosphere, atmosphere, maxVolumeToMove);
-					var quantity = @this.PipeNetwork.Atmosphere.GasMixture.Sum(x => x.Quantity.ToDouble(), MatterState.Gas);
-					//if (pressurekPa > OneAtmosphere)
-					//{
-					//	var num3 = num2 / (double) @this.CurrentGrids.Count;
-					//	MoveToEqualizeBidirectional(@this.PipeNetwork.Atmosphere, atmosphere, amountPressureToMove, MatterState.Gas, new MoleQuantity(num3));
-					//}
-					//else
-					//{
-					//	Mix(@this.PipeNetwork.Atmosphere, atmosphere, MatterState.Gas);
-					//}
-					if (IsSubmerged(@this.Position, atmosphere))
-						Mix(@this.PipeNetwork.Atmosphere, atmosphere, PipeVolume, MatterState.All);
-					else
-						Mix(@this.PipeNetwork.Atmosphere, atmosphere, PipeVolume, MatterState.All, MatterState.Gas);
-					// do energy exchange from work done by gas exchange
-					var matterFlow = new MoleQuantity(@this.PipeNetwork.Atmosphere.GasMixture.Sum(x => x.Quantity.ToDouble(), MatterState.Gas) - quantity);
-					var energy = PhysicsHelper.RemoveEnergy(ref @this.PipeNetwork.Atmosphere.GasMixture, matterFlow.FlowWork(@this.PipeNetwork.Atmosphere.Temperature));
-					PhysicsHelper.AddEnergy(ref atmosphere.GasMixture, energy);
-				}
+				if (!@this.GridController.CanContainAtmos(currentGrid))
+					continue;
+				var gassesAndLiquids = @this.PipeNetwork.Atmosphere.PressureGassesAndLiquids;
+				var atmosphere = traverse.Property<AtmosphericsController>("AtmosphericsController").Value.CloneGlobalAtmosphere(currentGrid);
+				var pressurekPa = RocketMath.Abs(atmosphere.PressureGassesAndLiquids - gassesAndLiquids);
+				var amountPressureToMove = RocketMath.Max(pressurekPa - @this.MaxPressure, pressurekPa / 10.0 / @this.CurrentGrids.Count);
+				var num1 = (@this.Volume / @this.PipeNetwork.Atmosphere.Volume).ToDouble() * @this.PipeNetwork.Atmosphere.TotalMoles.ToDouble();
+				var num2 = pressurekPa > @this.MaxPressure ? float.MaxValue : num1;
+				var maxVolumeToMove = @this.PipeNetwork.Atmosphere.TotalVolumeLiquids > @this.PipeNetwork.Atmosphere.Volume
+					? @this.PipeNetwork.Atmosphere.TotalVolumeLiquids - (@this.PipeNetwork.Atmosphere.Volume * 0.99) 
+					: @this.Volume;
+				//DrainLiquids(@this.PipeNetwork.Atmosphere, atmosphere, maxVolumeToMove);
+				var quantity = @this.PipeNetwork.Atmosphere.GasMixture.Sum(x => x.Quantity.ToDouble(), MatterState.Gas);
+				//if (pressurekPa > OneAtmosphere)
+				//{
+				//	var num3 = num2 / (double) @this.CurrentGrids.Count;
+				//	MoveToEqualizeBidirectional(@this.PipeNetwork.Atmosphere, atmosphere, amountPressureToMove, MatterState.Gas, new MoleQuantity(num3));
+				//}
+				//else
+				//{
+				//	Mix(@this.PipeNetwork.Atmosphere, atmosphere, MatterState.Gas);
+				//}
+				if (IsSubmerged(@this.Position, atmosphere))
+					Mix(@this.PipeNetwork.Atmosphere, atmosphere, PipeVolume, MatterState.All);
+				else
+					Mix(@this.PipeNetwork.Atmosphere, atmosphere, PipeVolume, MatterState.All, MatterState.Gas);
 			}
 			return false;
 		}
@@ -922,7 +1189,19 @@ public static class Patches
 	[HarmonyPatch(typeof(PassiveVent))]
 	public static class PassiveVentPatches
 	{
-		[PatchValidateCrc(0x012BA382)]
+		/*
+		public override void OnAtmosphericTick()
+		{
+			if (!this.HasOpenGrid || (Object) this.DockedAtmosArm != (Object) null && this.DockedAtmosArm.ArmState == ArmState.Down)
+				return;
+			PassiveVent._environment = this.AtmosphericsController.CloneGlobalAtmosphere(this.WorldGrid);
+			if (AtmosphereHelper.IsSubmerged(this.Position, PassiveVent._environment))
+				AtmosphereHelper.Mix(this.PipeNetwork?.Atmosphere, PassiveVent._environment, AtmosphereHelper.MatterState.All);
+			else
+				AtmosphereHelper.Mix(this.PipeNetwork?.Atmosphere, PassiveVent._environment, AtmosphereHelper.MatterState.Gas);
+		}
+		 */
+		[PatchValidateCrc(0x539D6D00)]
 		[HarmonyPatch(nameof(PassiveVent.OnAtmosphericTick))]
 		[HarmonyPrefix]
 		public static bool OnAtmosphericTickPrefix(PassiveVent __instance)
@@ -932,20 +1211,13 @@ public static class Patches
 			if (@this is null)
 				return false;
 
-			if (!@this.HasOpenGrid || (@this.DockedAtmosArm != null && @this.DockedAtmosArm.ArmState == ArmState.Down))
+			if (!@this.HasOpenGrid || (@this.DockedAtmosArm != null && @this.DockedAtmosArm.ArmState == ArmState.Down) || @this.PipeNetwork is null)
 				return false;
 			var atmosphere = traverse.Property<AtmosphericsController>("AtmosphericsController").Value.CloneGlobalAtmosphere(@this.WorldGrid);
-			//var pressureExternal = atmosphere.PressureGassesAndLiquids;
-			//var temperatureExternal = atmosphere.Temperature;
-			//var pressureInternal = @this.PipeNetwork.Atmosphere.PressureGassesAndLiquids;
-			//var temperatureInternal = @this.PipeNetwork.Atmosphere.Temperature;
 			if (IsSubmerged(@this.Position, atmosphere))
-				Mix(@this.PipeNetwork?.Atmosphere, atmosphere, @this.Volume, MatterState.All);
+				Mix(@this.PipeNetwork.Atmosphere, atmosphere, @this.Volume, MatterState.All);
 			else
-				Mix(@this.PipeNetwork?.Atmosphere, atmosphere, @this.Volume, MatterState.All, MatterState.Gas);
-			//AdiabaticsMod.Instance.Logger.LogDebug($"PassiveVent {GameManager.GameTickCount}.\n" +
-			//	$"Before: External {pressureExternal.ToDouble()}kPa, {temperatureExternal.ToDouble()}K, Internal {pressureInternal.ToDouble()}kPa, {temperatureInternal.ToDouble()}K\n" +
-			//	$"After: External {atmosphere.PressureGassesAndLiquids.ToDouble()}kPa, {atmosphere.Temperature.ToDouble()}K, Internal {@this.PipeNetwork.Atmosphere.PressureGassesAndLiquids.ToDouble()}kPa, {@this.PipeNetwork.Atmosphere.Temperature.ToDouble()}K");
+				Mix(@this.PipeNetwork.Atmosphere, atmosphere, @this.Volume, MatterState.All, MatterState.Gas);
 			return false;
 		}
 	}
