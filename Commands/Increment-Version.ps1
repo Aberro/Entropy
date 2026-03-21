@@ -87,12 +87,12 @@ if (-not $currentCommit) {
         $logBody = "[h1]Update v$lastProcessedVersion to v$newVersionString[/h1]`r`n`t[list]`r`n" + ($formattedCommits -join "`r`n") + "`r`n`t[/list]"
         $logBody = $logBody.Replace('"', '""')
         $changelogText = "`r`n[assembly: AssemblyMetadata(AssemblyMetadata.ChangeLog, @""`r`n`t$logBody`r`n"")]"
-        if ([regex]::IsMatch($content, $changelogPattern, [System.Text.RegularExpressions.RegexOptions]::Singleline) ) {
+        if ([regex]::IsMatch($content, $changelogPattern, [System.Text.RegularExpressions.RegexOptions]::Multiline) ) {
             $content = [regex]::Replace(
                 $content,
                 $changelogPattern,
                 $changelogText,
-                [System.Text.RegularExpressions.RegexOptions]::Singleline
+                [System.Text.RegularExpressions.RegexOptions]::Multiline
             )
         } else {
             $content = "$content`r`n$changelogText"
