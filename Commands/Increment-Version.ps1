@@ -68,26 +68,31 @@ if (-not $currentCommit) {
 } else {
     $gitMessages = @()
     if ($lastProcessedCommit) {
-        $gitMessages = git log "$lastProcessedCommit..HEAD" --pretty=format:"%s" 2>&1
+        $rawLog = git log "$lastProcessedCommit..HEAD" --pretty=format:"%h: %B" 2>&1 | Out-String
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "Git log failed: $rawLog"
+            exit 1
+        }
+        $gitMessages = [regex]::Split($rawLog, '(?m)(?=^[a-f0-9]{7,}: )', [System.Text.RegularExpressions.RegexOptions]::Multiline) |
+            ForEach-Object { $_.Trim() } |
+            Where-Object { $_ -ne "" }
     } else {
         exit 1
     }
 
-    if ($LASTEXITCODE -ne 0) {
-        Write-Warning "Git log failed: $gitMessages"
-        exit 1
-    } elseif ($gitMessages.Count -eq 0) {
+    if ($gitMessages.Count -eq 0) {
         Write-Host "No new commits since last version — changelog not updated."
     } else {
         $formattedCommits = $gitMessages | ForEach-Object { "`t`t[*] $_" }
         $logBody = "[h1]Update v$lastProcessedVersion to v$newVersionString[/h1]`r`n`t[list]`r`n" + ($formattedCommits -join "`r`n") + "`r`n`t[/list]"
+        $logBody = $logBody.Replace('"', '""')
         $changelogText = "`r`n[assembly: AssemblyMetadata(AssemblyMetadata.ChangeLog, @""`r`n`t$logBody`r`n"")]"
-        if ([regex]::IsMatch($content, $changelogPattern, [System.Text.RegularExpressions.RegexOptions]::Singleline) ) {
+        if ([regex]::IsMatch($content, $changelogPattern, [System.Text.RegularExpressions.RegexOptions]::Multiline) ) {
             $content = [regex]::Replace(
                 $content,
                 $changelogPattern,
                 $changelogText,
-                [System.Text.RegularExpressions.RegexOptions]::Singleline
+                [System.Text.RegularExpressions.RegexOptions]::Multiline
             )
         } else {
             $content = "$content`r`n$changelogText"
