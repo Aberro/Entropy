@@ -745,8 +745,8 @@ public static class Patches
 	public static class MixerPatches
 	{
 		[ConfigCategoryDefinition("Mixer", "Mixer", "Mixer configuration")]
-		[AutoConfigDefinition("Mixer orifice area", "Mixer", DisplayName = "Orifice area", DefaultValue = 0.25)]
-		public static double OrificeArea { get; set; }
+		[AutoConfigDefinition("Mixer volume", "Mixer", DisplayName = "Mixer volume", DefaultValue = 10)]
+		public static double VolumeMixer { get; set; }
 
 		[PatchValidateCrc(0x04559353)]
 		[HarmonyPatch(nameof(Mixer.OnAtmosphericTick))]
@@ -772,7 +772,7 @@ public static class Patches
 				@this.InputNetwork.Atmosphere.Volume,
 				@this.InputNetwork2.Atmosphere.Volume,
 				@this.OutputNetwork.Atmosphere.Volume,
-				OrificeArea,
+				new VolumeLitres(VolumeMixer),
 				@this.Ratio1 / 100d);
 			return false;
 
@@ -783,7 +783,7 @@ public static class Patches
 				VolumeLitres leftVolume,
 				VolumeLitres rightVolume,
 				VolumeLitres outputVolume,
-				double orificeArea,
+				VolumeLitres mixerVolume,
 				double ratio)
 			{
 				var totalEnergy = (leftMixture.TotalEnergy + rightMixture.TotalEnergy + outputMixture.TotalEnergy).ToDouble();
@@ -796,9 +796,6 @@ public static class Patches
 				// If it's positive, there's nothing to transfer.
 				if (pressureDifferential <= PressurekPa.Zero)
 					return;
-				// Determine the maximum amount of moles that can be transferred through both inputs when orifices are fully open.
-				var matterFlow1 = GetMatterFlowRateThroughOrifice(ref outputMixture, ref leftMixture, orificeArea, outputVolume, leftVolume);
-				var matterFlow2 = GetMatterFlowRateThroughOrifice(ref outputMixture, ref rightMixture, orificeArea, outputVolume, rightVolume);
 
 				// Try to determine the ideal ratio of moles to transfer through each input.
 				// Since the mixer is pressure driven and tries to proportionally mix the gases according to their pressure,
@@ -813,8 +810,12 @@ public static class Patches
 				var outputMixture1 = outputMixture;
 				var outputMixture2 = outputMixture;
 				// Get resulting output mixture for both inputs separately.
-				outputMixture1.Add(inputMixture1.Remove(matterFlow1, MatterState.All));
-				outputMixture2.Add(inputMixture2.Remove(matterFlow2, MatterState.All));
+				var matterFlow1 = inputMixture1.GetTotalMolesGassesAndLiquids;
+				var matterFlow2 = inputMixture2.GetTotalMolesGassesAndLiquids;
+				PhysicsHelper.Equalize(ref inputMixture1, ref outputMixture1, leftVolume, outputVolume, mixerVolume, MatterState.All);
+				matterFlow1 -= inputMixture1.GetTotalMolesGassesAndLiquids;
+				PhysicsHelper.Equalize(ref inputMixture2, ref outputMixture2, rightVolume, outputVolume, mixerVolume, MatterState.All);
+				matterFlow2 -= inputMixture2.GetTotalMolesGassesAndLiquids;
 				// Get the pressure change that each input causes.
 				var outputPressureDelta1 = outputMixture1.GetGasPressure(outputVolume) - outputPressure;
 				var outputPressureDelta2 = outputMixture2.GetGasPressure(outputVolume) - outputPressure;

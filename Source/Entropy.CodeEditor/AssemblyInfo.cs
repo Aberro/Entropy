@@ -3,7 +3,7 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.CodeEditor")]
 [assembly: AssemblyCompany("Aberro")]
-[assembly: AssemblyVersion("1.0.0.478")]
+[assembly: AssemblyVersion("1.0.0.481")]
 [assembly: AssemblyDescription(@"
 [h1][color=#ffa500]Entropy.CodeEditor[/color][/h1][br]
 Advanced source code editor for programmable chips in Stationeers.[br]
@@ -34,11 +34,11 @@ See: [url=https://github.com/StationeersLaunchPad/StationeersLaunchPad]Stationee
 ////////////////////////////////////
 // Code-generated: do not modify. //
 ////////////////////////////////////
-// Last processed commit: 5e192a33b90da9db27b1ea9bf11bd83d0b163b17
-// Last processed version: 1.0.0.438
+// Last processed commit: c1b2fee7f4fa2ca5d281897a634498e130300c40
+// Last processed version: 1.0.0.479
 [assembly: AssemblyMetadata(AssemblyMetadata.ChangeLog, @"
-	[h1]Update v1.0.0.399 to v1.0.0.438[/h1]
+	[h1]Update v1.0.0.438 to v1.0.0.479[/h1]
 	[list]
-		[*] Initial implementation of Entropy.Adiabatics mod.
+		[*] Attempt to fix passive vents/passive equalization.
 	[/list]
 ")]

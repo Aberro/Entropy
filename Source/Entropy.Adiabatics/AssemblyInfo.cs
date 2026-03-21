@@ -3,7 +3,7 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.Adiabatics")]
 [assembly: AssemblyCompany("Aberro")]
-[assembly: AssemblyVersion("1.0.0.461")]
+[assembly: AssemblyVersion("1.0.0.464")]
 [assembly: AssemblyDescription(@"
 [h1][color=#ffa500]Entropy.Adiabatics[/color][/h1][br]
 [h2][color=#ff0000]Experimental![/color][/h2][br]
@@ -42,11 +42,11 @@ See: [url=https://github.com/StationeersLaunchPad/StationeersLaunchPad]Stationee
 [assembly: AssemblyMetadata(AssemblyMetadata.Tag, Tags.StationeersLaunchPad)]
 [assembly: AssemblyMetadata(AssemblyMetadata.DependsOn, "ModID=\"Entropy.Common\"")]
 [assembly: AssemblyMetadata(AssemblyMetadata.OrderAfter, "ModID=\"Entropy.Common\"")]
-// Last processed commit: 5e192a33b90da9db27b1ea9bf11bd83d0b163b17
-// Last processed version: 1.0.0.421
+// Last processed commit: c1b2fee7f4fa2ca5d281897a634498e130300c40
+// Last processed version: 1.0.0.462
 [assembly: AssemblyMetadata(AssemblyMetadata.ChangeLog, @"
-	[h1]Update v1.0.0.382 to v1.0.0.421[/h1]
+	[h1]Update v1.0.0.421 to v1.0.0.462[/h1]
 	[list]
-		[*] Initial implementation of Entropy.Adiabatics mod.
+		[*] Attempt to fix passive vents/passive equalization.
 	[/list]
 ")]

@@ -3,7 +3,7 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.Common")]
 [assembly: AssemblyCompany("Aberro")]
-[assembly: AssemblyVersion("1.0.0.631")]
+[assembly: AssemblyVersion("1.0.0.633")]
 [assembly: AssemblyDescription(@"[center][h1][color=#ffa500]Entropy.Common[/color][/h1][/center][br]
 A Stationeers modding framework and utility library.
  It contains common code and utilities for Entropy mods, automates configuration handling, provides easy API for drawing ImGUI controls,
@@ -47,11 +47,11 @@ See: [url=https://github.com/StationeersLaunchPad/StationeersLaunchPad]Stationee
 ////////////////////////////////////
 // Code-generated: do not modify. //
 ////////////////////////////////////
-// Last processed commit: 5e192a33b90da9db27b1ea9bf11bd83d0b163b17
-// Last processed version: 1.0.0.589
+// Last processed commit: c1b2fee7f4fa2ca5d281897a634498e130300c40
+// Last processed version: 1.0.0.632
 [assembly: AssemblyMetadata(AssemblyMetadata.ChangeLog, @"
-	[h1]Update v1.0.0.547 to v1.0.0.589[/h1]
+	[h1]Update v1.0.0.589 to v1.0.0.632[/h1]
 	[list]
-		[*] Initial implementation of Entropy.Adiabatics mod.
+		[*] Attempt to fix passive vents/passive equalization.
 	[/list]
 ")]
