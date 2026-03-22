@@ -2,7 +2,7 @@
 using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.Processor")]
-[assembly: AssemblyVersion("1.0.0.476")]
+[assembly: AssemblyVersion("1.0.0.491")]
 [assembly: AssemblyDescription(@"
 [h1][color=#ffa500]Entropy.Processor[/color][/h1][br]
 Integrated Circuit processor replacement for Stationeers. Has better performance and supports easy extensibility.[br]
@@ -26,11 +26,20 @@ See: [url=https://github.com/StationeersLaunchPad/StationeersLaunchPad]Stationee
 [assembly: AssemblyMetadata(AssemblyMetadata.DependsOn, "ModID=\"Entropy.Common\"")]
 [assembly: AssemblyMetadata(AssemblyMetadata.OrderAfter, "ModID=\"Entropy.Common\"")]
 
-// Last processed commit: 05b9a12596f6910d2f231a63a4b78651c79627ed
-// Last processed version: 1.0.0.466
+// Last processed commit: a29441aee2a5f3ce15d7fd3c24d8a51d4fd38258
+// Last processed version: 1.0.0.490
 [assembly: AssemblyMetadata(AssemblyMetadata.ChangeLog, @"
-	[h1]Update v1.0.0.463 to v1.0.0.466[/h1]
+	[h1]Update v1.0.0.489 to v1.0.0.490[/h1]
 	[list]
-		[*] Updated to latest Stationeer version with new gases. PhysicsHelper.cs: * Fixed MolesEnumerator skipping first gas. * Fix for GetGasPressure to include minimum gas volume. * Removed GetMatterFlowRateThroughOrifice as incorrect (it calculates the matter flow, which is only useful for isobaric process) * Complete rework of Mix method. * Extracted Equalize method to use in mixer. Patches.cs: * Updated MixerPatches to use new Equalize method to equalize atmospheres on two sides limited by mixing volume.
+		[*] 0caeb74: Added multiline git log comments support to Increment-Version.ps1
+		[*] 614c73a: Entropy.Common:
+ HarmonyPatchInfo.cs:
+ * Fixed formatting in logging for CRC values.
+ Patches.cs:
+ * Updated SLP patching to exclude Entropy.Common from the list of ""offenders"".
+Entropy.Adiabatics:
+ Patches.cs:
+ * Updated patches CRCs, added decompiled sources to facilitate faster check for updates.
+ * Removed LiquidRocketEnginePatches - liquid rocket engine should not be applicable for adiabatic process.
 	[/list]
 ")]

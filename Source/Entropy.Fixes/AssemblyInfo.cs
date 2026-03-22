@@ -3,7 +3,7 @@ using System.Reflection;
 
 [assembly: AssemblyTitle("Entropy.Fixes")]
 [assembly: AssemblyCompany("Aberro")]
-[assembly: AssemblyVersion("1.0.0.475")]
+[assembly: AssemblyVersion("1.0.0.490")]
 [assembly: AssemblyDescription(@"
 [h1][color=#ffa500]Entropy.Fixes[/color][/h1][br]
 Contains various minor fixes or tweaks for Stationeers not covered by other mods.[br]
@@ -37,11 +37,20 @@ See: [url=https://github.com/StationeersLaunchPad/StationeersLaunchPad]Stationee
 [assembly: AssemblyMetadata(AssemblyMetadata.Tag, Tags.StationeersLaunchPad)]
 [assembly: AssemblyMetadata(AssemblyMetadata.DependsOn, "ModID=\"Entropy.Common\"")]
 [assembly: AssemblyMetadata(AssemblyMetadata.OrderAfter, "ModID=\"Entropy.Common\"")]
-// Last processed commit: 05b9a12596f6910d2f231a63a4b78651c79627ed
-// Last processed version: 1.0.0.465
+// Last processed commit: a29441aee2a5f3ce15d7fd3c24d8a51d4fd38258
+// Last processed version: 1.0.0.489
 [assembly: AssemblyMetadata(AssemblyMetadata.ChangeLog, @"
-	[h1]Update v1.0.0.462 to v1.0.0.465[/h1]
+	[h1]Update v1.0.0.488 to v1.0.0.489[/h1]
 	[list]
-		[*] Updated to latest Stationeer version with new gases. PhysicsHelper.cs: * Fixed MolesEnumerator skipping first gas. * Fix for GetGasPressure to include minimum gas volume. * Removed GetMatterFlowRateThroughOrifice as incorrect (it calculates the matter flow, which is only useful for isobaric process) * Complete rework of Mix method. * Extracted Equalize method to use in mixer. Patches.cs: * Updated MixerPatches to use new Equalize method to equalize atmospheres on two sides limited by mixing volume.
+		[*] 0caeb74: Added multiline git log comments support to Increment-Version.ps1
+		[*] 614c73a: Entropy.Common:
+ HarmonyPatchInfo.cs:
+ * Fixed formatting in logging for CRC values.
+ Patches.cs:
+ * Updated SLP patching to exclude Entropy.Common from the list of ""offenders"".
+Entropy.Adiabatics:
+ Patches.cs:
+ * Updated patches CRCs, added decompiled sources to facilitate faster check for updates.
+ * Removed LiquidRocketEnginePatches - liquid rocket engine should not be applicable for adiabatic process.
 	[/list]
 ")]

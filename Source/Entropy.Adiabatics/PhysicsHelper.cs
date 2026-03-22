@@ -195,19 +195,16 @@ public static class PhysicsHelper
 	{
 		var minimumGasVolume = Atmosphere.GetMinimumGasVolume(AtmosphereMode.Network);
 		var gasVolume = RocketMath.Max(volume - mixture.VolumeLiquids, minimumGasVolume);
-		if (mixture.VolumeLiquids > volume - minimumGasVolume)
-		{
-			// Copied from decompiled sources: Atmosphere.LiquidPressureOffset
-			if (mixture.GetTotalMolesLiquids < Chemistry.MINIMUM_QUANTITY_MOLES)
-			{
-				return PressurekPa.Zero;
-			}
-			var num = Math.Clamp((mixture.VolumeLiquids / volume).ToDouble(), 0.0, 1.0);
-			var num2 = num < 1.0 ? (10.0 / (1.0 - num)) - 10.0 : 1013249.9694824219;
-			return new PressurekPa(num2);
-		}
+		if (mixture.GetTotalMolesLiquids > Chemistry.MINIMUM_QUANTITY_MOLES && mixture.VolumeLiquids > volume - minimumGasVolume)
+			return LiquidPressureOffset(ref mixture, volume);
 
 		return IdealGas.Pressure(mixture.GetTotalMolesGasses, mixture.Temperature, gasVolume);
+
+		static PressurekPa LiquidPressureOffset(ref GasMixture mixture, VolumeLitres volume)
+		{
+			var num = Math.Clamp((mixture.VolumeLiquids / volume).ToDouble(), 0.0, 1.0);
+			return new PressurekPa(num < 1.0 ? (10.0 / (1.0 - num)) - 10.0 : 1013249.9694824219);
+		}
 	}
 
 	/// <summary>
